@@ -25,51 +25,51 @@ export class AuthController {
     return this.authService.login(createAuthDto)
   }
 
-  @Post('staff-signin')
-  @ApiOperation({ summary: 'SignIn your Account' })
-  loginStaff(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.loginStaff(createAuthDto)
-  }
+  // @Post('staff-signin')
+  // @ApiOperation({ summary: 'SignIn your Account' })
+  // loginStaff(@Body() createAuthDto: CreateAuthDto) {
+  //   return this.authService.loginStaff(createAuthDto)
+  // }
 
-  @Post('refresh-token')
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: "Generate access token" })
-  @UseGuards(RtGuard)
-  async refrshToken(@Req() req) {
-    const { user } = req
-    return this.authService.refreshTokenAdmin(user);
-  }
+  // @Post('refresh-token')
+  // @ApiBearerAuth('access-token')
+  // @ApiOperation({ summary: "Generate access token" })
+  // @UseGuards(RtGuard)
+  // async refrshToken(@Req() req) {
+  //   const { user } = req
+  //   return this.authService.refreshTokenAdmin(user);
+  // }
 
-  @Get('user-info')
-  @UseGuards(AtGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'User Info' })
-  userInfo(@Req() req: any) {
-    const user = req.user;
-    return this.authService.getCombinedUserInfo(user);
-  }
+  // @Get('user-info')
+  // @UseGuards(AtGuard)
+  // @ApiBearerAuth('access-token')
+  // @ApiOperation({ summary: 'User Info' })
+  // userInfo(@Req() req: any) {
+  //   const user = req.user;
+  //   return this.authService.getCombinedUserInfo(user);
+  // }
 
   @Post('forget-password')
   async forgetPassword(@Body() body: MailDto) {
-      return this.authService.forgetPasswordAdmin(body);
+    return this.authService.forgetPasswordAdmin(body);
   }
 
-  @Patch('update-password')
-  @Roles(roleType.admin,roleType.staff)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  updatePassword(@Req() req:any, @Body() passwordDto: passwordDto) {
-    console.log(req.user);
-    // const userId=req.user;
-    return this.authService.updatePassword(req.user, passwordDto);
-  }
+  // @Patch('update-password')
+  // @Roles(roleType.admin, roleType.staff)
+  // @UseGuards(AtGuard, RolesGuard)
+  // @ApiBearerAuth('access-token')
+  // updatePassword(@Req() req: any, @Body() passwordDto: passwordDto) {
+  //   console.log(req.user);
+  //   // const userId=req.user;
+  //   return this.authService.updatePassword(req.user, passwordDto);
+  // }
 
   @Patch('reset-password')
   @Roles(roleType.admin)
   @UseGuards(UtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  resetPassword(@Req() req:any, @Body() passwordDto: passwordDto) {
-    const userId=req.user.sub;
+  resetPassword(@Req() req: any, @Body() passwordDto: passwordDto) {
+    const userId = req.user.sub;
     return this.authService.resetPassword(userId, passwordDto);
   }
 }

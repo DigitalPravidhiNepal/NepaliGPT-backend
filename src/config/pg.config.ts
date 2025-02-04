@@ -7,16 +7,16 @@ const databaseConfig: TypeOrmModuleOptions = {
     port: 5432,
     username: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
-    database: process.env.PG_Databse,
+    database: process.env.PG_Database,
     synchronize: true,
     logging: false,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     extra: {
         "options": "-c timezone=UTC"
     },
-    ssl: {
-        rejectUnauthorized: false,
-    },
+    // ssl: {
+    //     rejectUnauthorized: false,
+    // },
 };
- 
+
 export default databaseConfig;  

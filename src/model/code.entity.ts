@@ -2,15 +2,15 @@ import { Column, Entity, ManyToOne } from "typeorm";
 import { parentEntity } from ".";
 import { userEntity } from "./user.entity";
 
-@Entity('image')
-export class imageEntity extends parentEntity {
+@Entity('code')
+export class codeEntity extends parentEntity {
     @Column()
     prompt: string;
 
     @Column()
-    image: string;
+    code: string;
 
-    @ManyToOne(() => userEntity, (user) => user.image)
+    @ManyToOne(() => userEntity, (user) => user.code)
     user: userEntity;
 
 }

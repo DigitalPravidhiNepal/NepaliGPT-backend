@@ -6,9 +6,6 @@ export class superAdminEntity extends parentEntity {
     @Column()
     name: string;
 
-    @Column()
-    address: string;
-
     @Column({ nullable: true })
     photo: string;
 

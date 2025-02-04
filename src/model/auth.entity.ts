@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, OneToOne } from "typeorm";
 import { parentEntity } from ".";
 import { roleType } from "src/helper/types/index.type";
 import { superAdminEntity } from "./superAdmin.entity";
+import { userEntity } from "./user.entity";
 @Entity('Auth')
 export class authEntity extends parentEntity {
     @Column({ unique: true })
@@ -18,4 +19,7 @@ export class authEntity extends parentEntity {
 
     @OneToOne(() => superAdminEntity, (sAdmin) => sAdmin.auth)
     superAdmin: superAdminEntity
+
+    @OneToOne(() => userEntity, (user) => user.auth)
+    user: userEntity
 }

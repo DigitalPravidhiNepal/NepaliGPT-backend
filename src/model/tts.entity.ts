@@ -2,15 +2,15 @@ import { Column, Entity, ManyToOne } from "typeorm";
 import { parentEntity } from ".";
 import { userEntity } from "./user.entity";
 
-@Entity('image')
-export class imageEntity extends parentEntity {
+@Entity('TextToSpeech')
+export class ttsEntity extends parentEntity {
     @Column()
-    prompt: string;
+    text: string;
 
     @Column()
-    image: string;
+    audio: string;
 
-    @ManyToOne(() => userEntity, (user) => user.image)
+    @ManyToOne(() => userEntity, (user) => user.chat)
     user: userEntity;
 
 }

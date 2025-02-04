@@ -88,8 +88,6 @@ export enum genderType {
 export type JwtPayload = {
     sub: string;
     role: string;
-    permissions?: string[];
-    rId?: string;
 };
 
 export interface clientEventId {
@@ -123,10 +121,10 @@ export enum JobNames {
 
 export type DateRangeType = 'day' | 'week' | 'month';
 
-export enum dateType{
-    day='day',
-    week='week',
-    month='month'
+export enum dateType {
+    day = 'day',
+    week = 'week',
+    month = 'month'
 }
 
 export enum PermissionType {
@@ -135,4 +133,10 @@ export enum PermissionType {
     TABLE_MANAGEMENT = 'Table Management',
     PRODUCT_MANAGEMENT = 'Product Management',
     ROLE_MANAGEMENT = 'Role Management',
+}
+
+export enum AccessType {
+    FREE = 'Free',
+    STANDARD = 'Standard',
+    PREMIUM = 'Premium'
 }

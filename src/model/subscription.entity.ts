@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "type
 import { parentEntity } from ".";
 import { packageEntity } from "./package.entity";
 import { packagePaymentEntity } from "./packagePayment.entity";
+import { userEntity } from "./user.entity";
 
 @Entity('subscription')
 export class subscriptionEntity extends parentEntity {
@@ -11,6 +12,8 @@ export class subscriptionEntity extends parentEntity {
     @Column()
     endDate: Date;
 
+    @ManyToOne(() => userEntity, (user) => user.subscription)
+    user: userEntity;
 
     @ManyToOne(() => packageEntity, (pckg) => pckg.subscription)
     package: packageEntity;

@@ -5,29 +5,19 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto, MailDto, passwordDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Token } from 'src/helper/utils/token';
 import { hash } from 'src/helper/utils/hash';
 import { authEntity } from 'src/model/auth.entity';
 import { JwtPayload, roleType } from 'src/helper/types/index.type';
-import { staffEntity } from 'src/model/staff.entity';
 import { sendMail } from 'src/config/mail.config';
-import { restaurantEntity } from 'src/model/Restaurant.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(authEntity)
     private readonly authRepository: Repository<authEntity>,
-
-    @InjectRepository(staffEntity)
-    private readonly staffRepository: Repository<staffEntity>,
-
-    @InjectRepository(restaurantEntity)
-    private readonly restaurentRepository: Repository<restaurantEntity>,
-
     private token: Token,
     private hash: hash,
   ) { }
@@ -38,6 +28,7 @@ export class AuthService {
     customer: 'customer',
     staff: 'staff',
   };
+
 
   async login(createAuthDto: CreateAuthDto) {
     const { email, password } = createAuthDto;
@@ -91,71 +82,71 @@ export class AuthService {
     return true;
   }
 
-  async loginStaff(body: CreateAuthDto) {
-    const authUser = await this.authRepository.findOne({
-      where: { email: body.email },
-      relations: ['staff', 'staff.staffType.permission', 'staff.restaurant']
-    });
-    if (!authUser) {
-      throw new ForbiddenException("User Not found")
-    }
-    const status = await this.hash.verifyHashing(authUser.password, body.password)
-    if (!status) {
-      throw new UnauthorizedException("Credential doesn't match")
-    }
-    const permissionarray = authUser?.staff?.staffType?.permission?.map(permission => permission.name);
-    const tokens = {
-      accessToken: await this.token.generateAcessToken({ sub: authUser.staff.id, role: authUser.role, permissions: permissionarray, rId: authUser.staff.restaurant.id }),
-      refreshToken: await this.token.generateRefreshToken({ sub: authUser.staff.id, role: authUser.role, permissions: permissionarray, rId: authUser.staff.restaurant.id }),
-      role: authUser.role,
-      permission: permissionarray
-    }
-    return tokens
-  }
+  // async loginStaff(body: CreateAuthDto) {
+  //   const authUser = await this.authRepository.findOne({
+  //     where: { email: body.email },
+  //     relations: ['staff', 'staff.staffType.permission', 'staff.restaurant']
+  //   });
+  //   if (!authUser) {
+  //     throw new ForbiddenException("User Not found")
+  //   }
+  //   const status = await this.hash.verifyHashing(authUser.password, body.password)
+  //   if (!status) {
+  //     throw new UnauthorizedException("Credential doesn't match")
+  //   }
+  //   const permissionarray = authUser?.staff?.staffType?.permission?.map(permission => permission.name);
+  //   const tokens = {
+  //     accessToken: await this.token.generateAcessToken({ sub: authUser.staff.id, role: authUser.role, permissions: permissionarray, rId: authUser.staff.restaurant.id }),
+  //     refreshToken: await this.token.generateRefreshToken({ sub: authUser.staff.id, role: authUser.role, permissions: permissionarray, rId: authUser.staff.restaurant.id }),
+  //     role: authUser.role,
+  //     permission: permissionarray
+  //   }
+  //   return tokens
+  // }
 
-  async getCombinedUserInfo(user: JwtPayload) {
-    const userEntity = this.roleUser[user.role];
-    if (userEntity === this.roleUser.admin) {
-      const userEntity = this.roleUser[user.role];
-      const userInfo = await this.authRepository.findOne({
-        where: { [userEntity]: { id: user.sub } },
-        relations: [userEntity],
-        select: {
-          id: true
-        }
-      });
-      return { userInfo, role: 'admin' }
-    } else if (userEntity === this.roleUser.staff) {
-      const authUser = await this.staffRepository.findOne({
-        where: { id: user.sub },
-        relations: ['staffType.permission']
-      });
-      const permissionarray = authUser?.staffType?.permission?.map(permission => permission.name);
-      return { permissionarray, userInfo: authUser, role: 'staff' }
-    } else {
-      throw new UnauthorizedException("Something unexpected error occured")
-    }
-  }
+  // async getCombinedUserInfo(user: JwtPayload) {
+  //   const userEntity = this.roleUser[user.role];
+  //   if (userEntity === this.roleUser.admin) {
+  //     const userEntity = this.roleUser[user.role];
+  //     const userInfo = await this.authRepository.findOne({
+  //       where: { [userEntity]: { id: user.sub } },
+  //       relations: [userEntity],
+  //       select: {
+  //         id: true
+  //       }
+  //     });
+  //     return { userInfo, role: 'admin' }
+  //   } else if (userEntity === this.roleUser.staff) {
+  //     const authUser = await this.staffRepository.findOne({
+  //       where: { id: user.sub },
+  //       relations: ['staffType.permission']
+  //     });
+  //     const permissionarray = authUser?.staffType?.permission?.map(permission => permission.name);
+  //     return { permissionarray, userInfo: authUser, role: 'staff' }
+  //   } else {
+  //     throw new UnauthorizedException("Something unexpected error occured")
+  //   }
+  // }
 
 
-  async refreshTokenAdmin(user: JwtPayload) {
-    return await this.token.generateAcessToken({ sub: user.sub, role: user.role, permissions: user?.permissions, rId: user?.rId })
-  }
+  // async refreshTokenAdmin(user: JwtPayload) {
+  //   return await this.token.generateAcessToken({ sub: user.sub, role: user.role, permissions: user?.permissions, rId: user?.rId })
+  // }
 
-  async updatePassword(user:JwtPayload, passwordDto: passwordDto) {
-    const { oldPassword,newPassword } = passwordDto;
-   const authUser=(user.role==roleType.staff)
-   ? await this.staffRepository.findOne({where:{id:user.sub},relations:['auth']})
-   : await this.restaurentRepository.findOne({where:{id:user.sub},relations:['auth']})
-   
-    const isValid = await this.hash.verifyHashing(authUser.auth.password, oldPassword);
-    if(!isValid){
-    throw new ForbiddenException('Invalid old password');
-    }
-    const hash = await this.hash.value(newPassword);
-    await this.authRepository.update({ id :authUser.auth.id}, { password: hash });
-    return true;
-  }
+  // async updatePassword(user: JwtPayload, passwordDto: passwordDto) {
+  //   const { oldPassword, newPassword } = passwordDto;
+  //   const authUser = (user.role == roleType.staff)
+  //     ? await this.staffRepository.findOne({ where: { id: user.sub }, relations: ['auth'] })
+  //     : await this.restaurentRepository.findOne({ where: { id: user.sub }, relations: ['auth'] })
+
+  //   const isValid = await this.hash.verifyHashing(authUser.auth.password, oldPassword);
+  //   if (!isValid) {
+  //     throw new ForbiddenException('Invalid old password');
+  //   }
+  //   const hash = await this.hash.value(newPassword);
+  //   await this.authRepository.update({ id: authUser.auth.id }, { password: hash });
+  //   return true;
+  // }
 
 
   async resetPassword(id: string, passwordDto: passwordDto) {

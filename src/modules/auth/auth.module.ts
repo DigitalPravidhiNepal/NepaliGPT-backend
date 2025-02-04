@@ -8,13 +8,11 @@ import { authEntity } from 'src/model/auth.entity';
 import { AtStrategy } from 'src/middlewares/access_token/at.strategy';
 import { RtStrategy } from 'src/middlewares/refresh_token/rt.strategy';
 import { JwtService } from '@nestjs/jwt';
-import { staffEntity } from 'src/model/staff.entity';
 import { UtStrategy } from 'src/middlewares/utils_token/ut.strategy';
-import { restaurantEntity } from 'src/model/Restaurant.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([authEntity,staffEntity,restaurantEntity])],
+  imports: [TypeOrmModule.forFeature([authEntity])],
   controllers: [AuthController],
-  providers: [AuthService,Token,hash,AtStrategy,RtStrategy,UtStrategy,JwtService],
+  providers: [AuthService, Token, hash, AtStrategy, RtStrategy, UtStrategy, JwtService],
 })
-export class AuthModule {}
+export class AuthModule { }
