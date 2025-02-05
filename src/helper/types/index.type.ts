@@ -1,9 +1,7 @@
 
 export enum roleType {
-    admin = 'admin',
     superAdmin = 'superAdmin',
-    customer = 'customer',
-    staff = 'staff'
+    customer = 'customer'
 }
 
 export enum enrollStatus {
@@ -140,3 +138,7 @@ export enum AccessType {
     STANDARD = 'Standard',
     PREMIUM = 'Premium'
 }
+
+export type VerifyPayload = {
+    email: string;
+};

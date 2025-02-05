@@ -13,7 +13,7 @@ export class userEntity extends parentEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column({ nullable: true })
     photo: string;
 
     @Column()
@@ -22,7 +22,7 @@ export class userEntity extends parentEntity {
     @Column()
     country: string;
 
-    @Column()
+    @Column({ default: false })
     isActive: boolean;
 
     @OneToOne(() => authEntity, (auth) => auth.user)

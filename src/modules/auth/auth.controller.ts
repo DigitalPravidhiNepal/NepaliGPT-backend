@@ -9,6 +9,7 @@ import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RtGuard } from 'src/middlewares/refresh_token/rt.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { UtGuard } from 'src/middlewares/utils_token/ut.guard';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -25,20 +26,35 @@ export class AuthController {
     return this.authService.login(createAuthDto)
   }
 
+  //get email for verification
+  @Post('get-verify')
+  getVerify(@Body() email: MailDto) {
+    return this.authService.getVerify(email);
+  }
+
+  //regiter account
+  @Post('register')
+  @UseGuards(UtGuard)
+  @ApiBearerAuth('access-token')
+  create(@Body() createuserdto: CreateUserDto, @Req() req: any) {
+    const jwtPayload = req.user;
+    return this.authService.create(createuserdto, jwtPayload);
+  }
+
   // @Post('staff-signin')
   // @ApiOperation({ summary: 'SignIn your Account' })
   // loginStaff(@Body() createAuthDto: CreateAuthDto) {
   //   return this.authService.loginStaff(createAuthDto)
   // }
 
-  // @Post('refresh-token')
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: "Generate access token" })
-  // @UseGuards(RtGuard)
-  // async refrshToken(@Req() req) {
-  //   const { user } = req
-  //   return this.authService.refreshTokenAdmin(user);
-  // }
+  @Post('refresh-token')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "Generate access token" })
+  @UseGuards(RtGuard)
+  async refrshToken(@Req() req) {
+    const { user } = req
+    return this.authService.refreshTokenAdmin(user);
+  }
 
   // @Get('user-info')
   // @UseGuards(AtGuard)
@@ -65,8 +81,7 @@ export class AuthController {
   // }
 
   @Patch('reset-password')
-  @Roles(roleType.admin)
-  @UseGuards(UtGuard, RolesGuard)
+  @UseGuards(UtGuard)
   @ApiBearerAuth('access-token')
   resetPassword(@Req() req: any, @Body() passwordDto: passwordDto) {
     const userId = req.user.sub;

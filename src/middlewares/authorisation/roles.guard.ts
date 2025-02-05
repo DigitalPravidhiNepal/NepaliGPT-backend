@@ -26,10 +26,10 @@
 // }
 
 
-import { Injectable, CanActivate, ExecutionContext, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSION_KEY, ROLES_KEY } from './roles.decorator';
-import { roleType, PermissionType } from 'src/helper/types/index.type';
+import { ROLES_KEY } from './roles.decorator';
+import { roleType, } from 'src/helper/types/index.type';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -40,37 +40,33 @@ export class RolesGuard implements CanActivate {
             context.getHandler(),
             context.getClass(),
         ]);
-        const requiredPermissions = this.reflector.getAllAndOverride<PermissionType[]>(PERMISSION_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
 
         const { user } = context.switchToHttp().getRequest();
 
         // Allow access if no roles and no permissions are required
-        if (!requiredRoles && !requiredPermissions) {
+        if (!requiredRoles) {
             return true;
         }
 
-        // Check roles
-        if (requiredRoles?.includes(user.role)) {
-            // Staff requires additional permission check
-            if (user.role === roleType.staff) {
-                if (!user.permissions || user.permissions.length === 0) {
-                    throw new UnprocessableEntityException('Staff without permissions cannot proceed');
-                }
-                if(requiredPermissions === undefined){
-                    return true;
-                }else{
-                    return requiredPermissions?.some(permission =>
-                        user.permissions.includes(permission),
-                    );
-                }
-            }
+        // // Check roles
+        // if (requiredRoles?.includes(user.role)) {
+        //     // Staff requires additional permission check
+        //     if (user.role === roleType.staff) {
+        //         if (!user.permissions || user.permissions.length === 0) {
+        //             throw new UnprocessableEntityException('Staff without permissions cannot proceed');
+        //         }
+        //         if(requiredPermissions === undefined){
+        //             return true;
+        //         }else{
+        //             return requiredPermissions?.some(permission =>
+        //                 user.permissions.includes(permission),
+        //             );
+        //         }
+        //     }
 
-            // For restaurant and super_admin, roles alone are sufficient
-            return true;
-        }
+        // // For restaurant and super_admin, roles alone are sufficient
+        //     return true;
+        // }
 
         // Deny access by default
         return false;

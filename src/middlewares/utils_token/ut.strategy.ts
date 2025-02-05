@@ -17,6 +17,8 @@ export class UtStrategy extends PassportStrategy(Strategy, 'jwt-reset') {
         });
     }
     async validate(req: Request, payload) {
+        console.log(payload);
+
         return payload;
     }
 }
