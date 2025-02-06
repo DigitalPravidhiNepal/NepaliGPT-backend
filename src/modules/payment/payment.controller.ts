@@ -2,10 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('payment')
+@ApiTags('Payment')
+@ApiResponse({ status: 201, description: 'Created Successfully' })
+@ApiResponse({ status: 401, description: 'Unathorised request' })
+@ApiResponse({ status: 400, description: 'Bad request' })
+@ApiResponse({ status: 500, description: 'Server Error' })
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly paymentService: PaymentService) { }
 
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {

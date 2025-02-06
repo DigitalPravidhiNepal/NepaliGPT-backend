@@ -23,8 +23,6 @@ export class AuthService {
   constructor(
     @InjectRepository(authEntity)
     private readonly authRepository: Repository<authEntity>,
-    // @InjectRepository(userEntity)
-    // private readonly userRepo: Repository<userEntity>,
     private token: Token,
     private hash: hash,
     private dataSource: DataSource
@@ -132,7 +130,7 @@ export class AuthService {
       throw new NotFoundException("Email doesn't exist.");
     }
     const token = await this.token.generateUtilToken({
-      sub: existingUser.user.id,
+      sub: existingUser.id,
       role: existingUser.role,
     });
     const frontURL = `${process.env.FRONT_URL}/reset?token=${token}`;
@@ -177,10 +175,20 @@ export class AuthService {
 
 
   async resetPassword(id: string, passwordDto: passwordDto) {
-    const { password } = passwordDto;
-    const hash = await this.hash.value(password);
-    await this.authRepository.update({ id }, { password: hash });
-    return true;
+    try {
+      const { password } = passwordDto;
+      const hash = await this.hash.value(password);
+      const user = await this.authRepository.findOne({ where: { id } });
+      if (!user) {
+        throw new BadRequestException("User does'nt exist");
+      }
+      user.password = hash;
+      return await this.authRepository.save(user);
+    } catch (e) {
+
+    }
+
+
   }
 
   passwordTemplate(resetUrl: any) {

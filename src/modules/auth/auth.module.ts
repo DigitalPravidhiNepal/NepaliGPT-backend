@@ -10,6 +10,7 @@ import { RtStrategy } from 'src/middlewares/refresh_token/rt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { UtStrategy } from 'src/middlewares/utils_token/ut.strategy';
 import { ConfigService } from '@nestjs/config';
+import { userEntity } from 'src/model/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([authEntity])],
