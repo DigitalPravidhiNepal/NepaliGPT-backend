@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { ImageModule } from './modules/image/image.module';
 
 
 @Module({
@@ -20,6 +21,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     UserModule,
     SuperAdminModule,
     PaymentModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

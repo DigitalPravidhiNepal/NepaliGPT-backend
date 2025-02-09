@@ -44,7 +44,7 @@ export class AuthService {
       if (!status) {
         throw new UnauthorizedException("Credential doesn't match");
       }
-      const userId = authUser.user.id;
+      const userId = authUser.superAdmin ? authUser.superAdmin.id : authUser.user.id;
       const tokens = {
         accessToken: await this.token.generateAcessToken({
           sub: userId,

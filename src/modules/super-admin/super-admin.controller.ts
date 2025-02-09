@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe, Query } from '@nestjs/common';
 import { SuperAdminService } from './super-admin.service';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -9,6 +9,8 @@ import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { packageEntity } from 'src/model/package.entity';
 import { UUID } from 'crypto';
 import { CreateSuperAdminDto } from './dto/create-super-admin.dto';
+import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
+import { PaginationDto } from 'src/helper/utils/pagination.dto';
 
 @Controller('super-admin')
 @ApiTags('Super Admin')
@@ -36,24 +38,14 @@ export class SuperAdminController {
   //   return this.superAdminService.deleteSuperAdmin(id);
   // }
 
-  // // Add Restaurant
-  // @Post('restaurant-account')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'create restaurant account' })
-  // createRestaurant(@Body() createAuthDto: CreateRestaurant) {
-  //   return this.superAdminService.createRestaurant(createAuthDto);
-  // }
-
-  // @Get('restaurant-account')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'Get all restaurant account' })
-  // findAllRestaurant() {
-  //   return this.superAdminService.findAllRestaurant();
-  // }
+  @Get('all-user')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all user accounts' })
+  findAllUser(@Query() paginationDto?: PaginationDto) {
+    return this.superAdminService.findAllUser(paginationDto);
+  }
 
   // // Update Restaurant Status
   // @Patch('restaurant-account')
@@ -65,35 +57,25 @@ export class SuperAdminController {
   //   return this.superAdminService.updateRestaurantStatus(data);
   // }
 
-  // // Delete Restaurant
-  // @Delete('delete-restaurant/:id')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'delete restaurant account' })
-  // deleteRestaurant(@Param('id', ParseUUIDPipe) id: UUID) {
-  //   return this.superAdminService.deleteRestaurant(id);
-  // }
+  // Create a new package
+  @Post('create-package')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'create packakge' })
+  async createPackage(@Body() createPackageDto: CreatePackageDto) {
+    return this.superAdminService.createPackage(createPackageDto);
+  }
 
-  // // Create a new package
-  // @Post('create-package')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'create pacakge' })
-  // async createPackage(@Body() createPackageDto: CreatePackageDto) {
-  //   return this.superAdminService.createPackage(createPackageDto);
-  // }
-
-  // // Get all pacakges
-  // @Get('get-packages')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'get all pacakges' })
-  // async findAll(): Promise<packageEntity[]> {
-  //   return this.superAdminService.findAllPackage();
-  // }
+  // Get all pacakges
+  @Get('get-packages')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'get all pacakges' })
+  async findAll(): Promise<packageEntity[]> {
+    return this.superAdminService.findAllPackage();
+  }
 
   // // Get all pacakges by id
   // @Get('get-packages/:id')
@@ -105,26 +87,26 @@ export class SuperAdminController {
   //   return this.superAdminService.findAllPackageById(id);
   // }
 
-  // // Update pacakge
-  // @Patch('update-packages/:id')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'update pacakge' })
-  // async update(
-  //   @Param('id') id: string,
-  //   @Body() updatePackageDto: UpdatePackageDto,
-  // ) {
-  //   return this.superAdminService.updatePackage(id, updatePackageDto);
-  // }
+  // Update pacakge
+  @Patch('update-packages/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'update pacakge' })
+  async update(
+    @Param('id') id: string,
+    @Body() updatePackageDto: UpdatePackageDto,
+  ) {
+    return this.superAdminService.updatePackage(id, updatePackageDto);
+  }
 
-  // // Delete pacakge
-  // @Delete('delete-packages/:id')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'delete pacakge' })
-  // async delete(@Param('id', ParseUUIDPipe) id: UUID): Promise<packageEntity> {
-  //   return this.superAdminService.deletePackage(id);
-  // }
+  // Delete pacakge
+  @Delete('delete-packages/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'delete pacakge' })
+  async delete(@Param('id', ParseUUIDPipe) id: UUID): Promise<packageEntity> {
+    return this.superAdminService.deletePackage(id);
+  }
 } 

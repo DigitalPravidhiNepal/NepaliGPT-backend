@@ -59,11 +59,11 @@ export class CreatePackageDto {
     @ApiProperty({ enum: AccessType })
     templateAccess: AccessType;
 
-    @IsDecimal()
+    @IsNumber()
     @ApiProperty()
     monthly_price: number;
 
-    @IsDecimal()
+    @IsNumber()
     @ApiProperty()
     yearly_price: number;
 }
@@ -129,13 +129,13 @@ export class UpdatePackageDto {
     @ApiProperty({ required: false, enum: AccessType })
     templateAccess?: AccessType;
 
-    @IsDecimal()
     @IsOptional()
+    @IsNumber()
     @ApiProperty({ required: false })
     monthly_price?: number;
 
-    @IsDecimal()
     @IsOptional()
+    @IsNumber()
     @ApiProperty({ required: false })
     yearly_price?: number;
 }

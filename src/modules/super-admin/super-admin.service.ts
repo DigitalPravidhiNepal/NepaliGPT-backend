@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateSuperAdminDto } from './dto/create-super-admin.dto';
 import { UpdateSuperAdminDto } from './dto/update-super-admin.dto';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
@@ -10,6 +10,8 @@ import { hash } from 'src/helper/utils/hash';
 import { packageEntity } from 'src/model/package.entity';
 import { UUID } from 'crypto';
 import { superAdminEntity } from 'src/model/superAdmin.entity';
+import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
+import { PaginationDto } from 'src/helper/utils/pagination.dto';
 
 @Injectable()
 export class SuperAdminService {
@@ -63,82 +65,70 @@ export class SuperAdminService {
   //   return await this.authRepository.remove(existingAdmin);
   // }
 
-  // async createRestaurant(data: CreateRestaurant) {
-  //   const queryRunner = this.dataSource.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction();
-  //   try {
-  //     const { email, password, name, address, zip_code, phone } = data;
-  //     const hashedPassword = await this.hash.value(password);
-  //     const auth = new authEntity();
-  //     auth.email = email;
-  //     (auth.password = hashedPassword), (auth.role = roleType.admin);
-  //     await queryRunner.manager.save(auth);
-
-  //     const restaurant = new restaurantEntity();
-  //     restaurant.name = name;
-  //     restaurant.address = address;
-  //     restaurant.zip_code = zip_code;
-  //     restaurant.auth = auth;
-  //     restaurant.phone = phone;
-  //     await queryRunner.manager.save(restaurant);
-
-  //     await queryRunner.commitTransaction();
-  //     return true;
-  //   } catch (error) {
-  //     console.log(error);
-  //     await queryRunner.rollbackTransaction();
-  //     throw new ForbiddenException(error.errorResponse);
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
-  // async updateRestaurantStatus(data: updateRestaurant) {
-  //   const exisingRestaurant = await this.restaurantRepository.findOne({
-  //     where: { id: data.id },
-  //   });
-  //   exisingRestaurant.status = data.isDisabled ? RestaurantStatus.inactive : RestaurantStatus.active;
-  //   await this.restaurantRepository.save(exisingRestaurant);
-  // }
 
   // async deleteRestaurant(id: UUID): Promise<restaurantEntity> {
   //   const existingRestaurant = await this.restaurantRepository.findOne({ where: { id } });
   //   return await this.restaurantRepository.remove(existingRestaurant);
   // }
 
-  // async findAllRestaurant() {
-  //   return await this.restaurantRepository.find({
-  //     relations: ['auth'],
-  //     select: {
-  //       auth: {
-  //         email: true,
-  //       },
-  //     },
-  //   });
-  // }
+  async findAllUser(paginationDto?: PaginationDto) {
+    try {
+      const { page, pageSize } = paginationDto || {};
 
-  // async createPackage(createPackageDto: CreatePackageDto): Promise<packageEntity> {
-  //   const newPackage = this.packageRepository.create(createPackageDto);
-  //   return await this.packageRepository.save(newPackage);
-  // }
+      const queryBuilder = this.authRepository
+        .createQueryBuilder('auth')
+        .leftJoinAndSelect('auth.user', 'user')
+        .leftJoinAndSelect('user.subscription', 'subscription')
+        .leftJoinAndSelect('subscription.package', 'package')
+        .where('auth.role = :role', { role: roleType.customer })
+        .select([
+          'auth.email',
+          'auth.createdAt',
+          'user.name',
+          'user.isActive',
+          'user.photo',
+          'package.name',
+        ]);
+
+      // Apply pagination only if page & pageSize are provided
+      if (page && pageSize) {
+        queryBuilder.skip((page - 1) * pageSize).take(pageSize);
+      }
+
+      const [pagedUsers, count] = await queryBuilder.getManyAndCount();
+
+      return {
+        total: count,
+        pagedUsers,
+      };
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+
+  async createPackage(createPackageDto: CreatePackageDto): Promise<packageEntity> {
+    const newPackage = this.packageRepository.create(createPackageDto);
+    return await this.packageRepository.save(newPackage);
+  }
 
   // async findAllPackageById(id: UUID): Promise<packageEntity> {
   //   return await this.packageRepository.findOne({ where: { id: id } });
   // }
 
-  // async findAllPackage(): Promise<packageEntity[]> {
-  //   return await this.packageRepository.find();
-  // }
+  async findAllPackage(): Promise<packageEntity[]> {
+    return await this.packageRepository.find();
+  }
 
-  // async updatePackage(id: string, updatePackageDto: CreatePackageDto): Promise<packageEntity> {
-  //   const existingPackage = await this.packageRepository.findOne({ where: { id } });
-  //   const updatedPackage = Object.assign(existingPackage, updatePackageDto);
-  //   return await this.packageRepository.save(updatedPackage);
-  // }
+  async updatePackage(id: string, updatePackageDto: UpdatePackageDto): Promise<packageEntity> {
+    const existingPackage = await this.packageRepository.findOne({ where: { id } });
+    const updatedPackage = Object.assign(existingPackage, updatePackageDto);
+    return await this.packageRepository.save(updatedPackage);
+  }
 
-  // async deletePackage(id: UUID): Promise<packageEntity> {
-  //   const existingPackage = await this.packageRepository.findOne({ where: { id } });
-  //   return await this.packageRepository.remove(existingPackage);
-  // }
+  async deletePackage(id: UUID): Promise<packageEntity> {
+    const existingPackage = await this.packageRepository.findOne({ where: { id } });
+    return await this.packageRepository.remove(existingPackage);
+  }
 
 }

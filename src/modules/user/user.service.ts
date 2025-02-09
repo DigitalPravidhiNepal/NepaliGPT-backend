@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { userEntity } from 'src/model/user.entity';
 import { Repository } from 'typeorm';
+import { TransformationType } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -15,12 +16,22 @@ export class UserService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    try {
+      const user = await this.userRepository.find();
+      return user;
+    } catch (e) {
+      throw new BadRequestException("No users ");
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      return user;
+    } catch (e) {
+      throw new BadRequestException("user doesn't exist");
+    }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -36,15 +47,38 @@ export class UserService {
     }
   }
 
+  async updateInfo(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      if (!user) {
+        throw new BadRequestException("User doesn't exist");
+      }
+      const updateUser = Object.assign(user, updateUserDto);
+      return await this.userRepository.save(updateUser);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
   async updatePhoto(id: string, photo: string) {
-    const user = await this.userRepository.findOne({ where: { id } });
-    user.photo = photo;
-    await this.userRepository.save(user);
-    return true
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      user.photo = photo;
+      await this.userRepository.save(user);
+      return true
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+
   }
 
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } });
+      return await this.userRepository.remove(user);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }
