@@ -9,6 +9,7 @@ import { UserModule } from './modules/user/user.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ImageModule } from './modules/image/image.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 
 @Module({
@@ -22,6 +23,7 @@ import { ImageModule } from './modules/image/image.module';
     SuperAdminModule,
     PaymentModule,
     ImageModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

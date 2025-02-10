@@ -17,3 +17,27 @@ export class CreateSuperAdminDto {
     name: string;
 
 }
+export class CreateBotDto {
+
+    @IsString()
+    @ApiProperty()
+    name: string;
+
+    @IsString()
+    @ApiProperty()
+    role: string;
+
+    @IsString()
+    @ApiProperty()
+    instructions: string;
+
+    @ApiProperty({ required: false, type: 'string', format: 'binary' })
+    @IsOptional()
+    photo?: any;
+}
+
+export class UpdatePhotoDto {
+    @ApiProperty({ required: false, type: 'string', format: 'binary' })
+    @IsOptional()
+    photo: any;
+}

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { ImageService } from './image.service';
 
 import { GenerateImageDto } from './dto/create-image.dto';
@@ -23,14 +23,25 @@ export class ImageController {
   @Roles(roleType.superAdmin, roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all user accounts' })
-  async generateImage(@Body() generateImageDto: GenerateImageDto) {
-    return this.imageService.generateImage(generateImageDto)
+  @ApiOperation({ summary: 'generate images' })
+  async generateImage(@Body() generateImageDto: GenerateImageDto, @Req() req: any) {
+    const { sub, role } = req.user;
+    if (role === roleType.customer) {
+      return this.imageService.generateImage(generateImageDto, sub);
+    } else {
+      return this.imageService.generateImage(generateImageDto);
+    }
+
   }
 
-  @Get()
-  findAll() {
-    return this.imageService.findAll();
+  @Get('get-images')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all images' })
+  findAll(@Req() req: any) {
+    const id = req.user.id;
+    return this.imageService.findAll(id);
   }
 
   @Get(':id')
