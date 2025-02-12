@@ -4,8 +4,15 @@ import { userEntity } from "./user.entity";
 
 @Entity('code')
 export class codeEntity extends parentEntity {
+
     @Column()
-    prompt: string;
+    title: string;
+
+    @Column()
+    language: string;
+
+    @Column()
+    description: string;
 
     @Column()
     code: string;

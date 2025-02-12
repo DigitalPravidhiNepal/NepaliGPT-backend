@@ -1,54 +1,54 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
-import { ChatService } from './chat.service';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CodeService } from './code.service';
+import { CreateCodeDto } from './dto/create-code.dto';
+import { UpdateCodeDto } from './dto/update-code.dto';
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 
-@Controller('chat')
-@ApiTags('chat')
+@Controller('code')
+@ApiTags('Code')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })
 @ApiResponse({ status: 400, description: 'Bad request' })
 @ApiResponse({ status: 500, description: 'Server Error' })
-export class ChatController {
-  constructor(private readonly chatService: ChatService) { }
+export class CodeController {
+  constructor(private readonly codeService: CodeService) { }
 
   @Post()
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'generate chat' })
-  create(@Body() createChatDto: CreateChatDto, @Req() req: any) {
-    const { sub } = req.user;
-    return this.chatService.chat(createChatDto, sub);
+  @ApiOperation({ summary: 'generate AI codes' })
+  create(@Body() createCodeDto: CreateCodeDto, @Req() req: any) {
+    const id = req.user.sub;
+    return this.codeService.generateCode(createCodeDto, id);
   }
 
-  @Get('get-chats/:id')
+  @Get()
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'get chats' })
-  findAll(@Req() req: any, @Param('id') BotId: string) {
+  @ApiOperation({ summary: 'get all codes' })
+  findAll(@Req() req: any) {
     const id = req.user.sub;
-    return this.chatService.findAll(id, BotId);
+    return this.codeService.findAll(id);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.chatService.findOne(+id);
+    return this.codeService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto) {
-    return this.chatService.update(+id, updateChatDto);
+  update(@Param('id') id: string, @Body() updateCodeDto: UpdateCodeDto) {
+    return this.codeService.update(+id, updateCodeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.chatService.remove(+id);
+    return this.codeService.remove(+id);
   }
 }

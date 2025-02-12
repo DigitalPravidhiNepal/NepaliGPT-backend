@@ -25,9 +25,9 @@ export class ChatService {
     return 'This action adds a new chat';
   }
 
-  async findAll(id: string) {
+  async findAll(id: string, botId) {
     try {
-      const chat = await this.chatRepository.find({ where: { user: { id } } });
+      const chat = await this.chatRepository.find({ where: { user: { id }, bot: { id: botId } } });
       return chat;
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -38,7 +38,6 @@ export class ChatService {
       const { prompt, botId } = createChatDto;
       const bot = await this.botRepository.findOne({ where: { id: botId } });
       if (!bot) throw new Error('Bot not found');
-
       const response = await this.openai.chat.completions.create({
         model: "gpt-4-turbo",
         messages: [
@@ -53,6 +52,7 @@ export class ChatService {
         const chat = new chatEntity();
         chat.prompt = prompt;
         chat.response = answer;
+        chat.bot = bot;
         chat.user = { id } as userEntity;
         await this.chatRepository.save(chat);
       }

@@ -10,6 +10,7 @@ import { SuperAdminModule } from './modules/super-admin/super-admin.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { CodeModule } from './modules/code/code.module';
 
 
 @Module({
@@ -24,6 +25,7 @@ import { ChatModule } from './modules/chat/chat.module';
     PaymentModule,
     ImageModule,
     ChatModule,
+    CodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
