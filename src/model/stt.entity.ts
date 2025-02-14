@@ -4,8 +4,15 @@ import { userEntity } from "./user.entity";
 
 @Entity('SpeechToText')
 export class sttEntity extends parentEntity {
+
+    @Column()
+    title: string;
+
     @Column()
     audio: string;
+
+    @Column()
+    description: string;
 
     @Column()
     transcription: string;

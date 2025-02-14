@@ -11,6 +11,8 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { CodeModule } from './modules/code/code.module';
+import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
+import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.module';
 
 
 @Module({
@@ -26,6 +28,8 @@ import { CodeModule } from './modules/code/code.module';
     ImageModule,
     ChatModule,
     CodeModule,
+    SpeechToTextModule,
+    TextToSpeechModule,
   ],
   controllers: [AppController],
   providers: [AppService],

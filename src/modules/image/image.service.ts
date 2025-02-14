@@ -15,15 +15,15 @@ export class ImageService {
   ) {
     // Initialize OpenAI API client
     this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your .env
+      apiKey: process.env.OPENAI_API_KEY,
     });
   }
-  async generateImage(generateImageDto: GenerateImageDto, id?: string): Promise<any> {
+  async generateImage(generateImageDto: GenerateImageDto, id?: string) {
 
     const { title, artStyle, lightingStyle, moodStyle, imageSize, numberOfImages } = generateImageDto;
 
-    // Construct the prompt dynamically based on the DTO values
-    let fullPrompt = title;  // Start with the title
+
+    let fullPrompt = title;
     if (artStyle) fullPrompt += `, in the style of ${artStyle}`;
     if (lightingStyle) fullPrompt += `, with ${lightingStyle} lighting`;
     if (moodStyle) fullPrompt += `, evoking a ${moodStyle} mood`;
