@@ -1,20 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsEnum, IsString } from "class-validator";
+import { SpeechTone } from "src/helper/types/index.type";
 
 export class CreateTextToSpeechDto {
-    @ApiProperty()
-    @IsString()
-    title: string;
+    @ApiProperty({
+        enum: SpeechTone,  // Specifies the enum type
+        enumName: 'SpeechTone',  // Optional: can help with clearer UI representation
+        description: 'The tone of the speech'  // Optional description
+    })
+    @IsEnum(SpeechTone)
+    tone: SpeechTone;
 
     @ApiProperty()
     @IsString()
-    language: string
-
-    @ApiProperty()
-    @IsString()
-    tone: string
-
-    @ApiProperty()
-    @IsString()
-    description: string
+    text: string
 }

@@ -142,3 +142,12 @@ export enum AccessType {
 export type VerifyPayload = {
     email: string;
 };
+
+export enum SpeechTone {
+    NEUTRAL = 'neutral',
+    PROFESSIONAL = 'professional',
+    STORYTELLING = 'storytelling',
+    FRIENDLY = 'friendly',
+    ROBOTIC = 'robotic',
+    RELAXING = 'relaxing'
+}

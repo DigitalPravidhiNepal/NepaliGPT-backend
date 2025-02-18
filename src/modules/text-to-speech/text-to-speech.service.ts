@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ttsEntity } from 'src/model/tts.entity';
 import { Repository } from 'typeorm';
 import { userEntity } from 'src/model/user.entity';
+import { SpeechTone } from 'src/helper/types/index.type';
 
 @Injectable()
 export class TextToSpeechService {
@@ -32,13 +33,26 @@ export class TextToSpeechService {
 
   async generateSpeech(createTextToSpeech: CreateTextToSpeechDto, id: string) {
     try {
-      const { title, language, tone, description } = createTextToSpeech;
-      const text = `${title}: In ${language}, with a ${tone} tone. ${description}`;
+      const { tone, text } = createTextToSpeech;
+      const voiceMapping = {
+        neutral: 'alloy',
+        professional: 'onyx',
+        storytelling: 'fable',
+        friendly: 'nova',
+        robotic: 'echo',
+        relaxing: 'shimmer'
+      } as const;
+
+      // Get the corresponding voice from the mapping
+      const selectedVoice = voiceMapping[tone] || 'alloy'; // Default to Alloy if not found
+      console.log(selectedVoice);
+
+
       const speechFilePath = path.resolve('./speech.mp3');
 
       const mp3 = await this.openai.audio.speech.create({
         model: 'tts-1',
-        voice: 'alloy', // Other voices: echo, fable, onyx, nova, shimmer
+        voice: selectedVoice,
         input: text,
       });
 
@@ -46,11 +60,8 @@ export class TextToSpeechService {
       await fs.promises.writeFile(speechFilePath, buffer);
       const Audio = await this.uploadToCloudinary(speechFilePath);
       const tts = new ttsEntity();
-      tts.title = title;
-      tts.language = language;
-      tts.tone = tone;
       tts.audio = Audio;
-      tts.description = description;
+      tts.text = text;
       tts.user = { id } as userEntity;
       return await this.ttsRepository.save(tts);
     } catch (error) {

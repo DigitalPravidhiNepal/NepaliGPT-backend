@@ -13,6 +13,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { CodeModule } from './modules/code/code.module';
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.module';
+import { TemplatesModule } from './modules/templates/templates.module';
 
 
 @Module({
@@ -30,6 +31,7 @@ import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.modu
     CodeModule,
     SpeechToTextModule,
     TextToSpeechModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
