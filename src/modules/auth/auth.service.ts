@@ -78,7 +78,7 @@ export class AuthService {
         const token = await this.token.generateVerifyToken({ email: email });
         console.log(token);
 
-        const frontURL = `${process.env.FRONT_URL}/Verify?token=${token}`;
+        const frontURL = `${process.env.FRONT_URL}/Verify?${token}`;
         try {
           sendMail(email, 'Email Verification', this.emailTemplate(frontURL));
         } catch (error) {
@@ -133,7 +133,7 @@ export class AuthService {
       sub: existingUser.id,
       role: existingUser.role,
     });
-    const frontURL = `${process.env.FRONT_URL}/reset?token=${token}`;
+    const frontURL = `${process.env.FRONT_URL}/reset?${token}`;
     try {
       sendMail(body.email, 'Password Reset', this.passwordTemplate(frontURL));
     } catch (error) {
