@@ -151,3 +151,10 @@ export enum SpeechTone {
     ROBOTIC = 'robotic',
     RELAXING = 'relaxing'
 }
+
+export enum Creativity {
+    LOW = 'low',
+    MEDIUM = 'medium',
+    HIGH = 'high'
+}
+

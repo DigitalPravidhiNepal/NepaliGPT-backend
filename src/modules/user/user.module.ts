@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { userEntity } from 'src/model/user.entity';
 import { UploadService } from 'src/helper/utils/files_upload';
-import { ConvertAudio } from 'src/helper/utils/conversion';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([userEntity])],

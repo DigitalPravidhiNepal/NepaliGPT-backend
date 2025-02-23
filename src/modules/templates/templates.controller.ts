@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
-import { CreateTemplateDto } from './dto/create-template.dto';
+import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import OpenAI from 'openai';
@@ -23,6 +23,11 @@ export class TemplatesController {
   @Post()
   create(@Body() createTemplateDto: CreateTemplateDto) {
     return this.templatesService.create(createTemplateDto);
+  }
+
+  @Post('generate/:id')
+  generate(@Param('id') id: string, @Body() GenerateDto: generateDto) {
+    return this.templatesService.generate(id, GenerateDto);
   }
 
   @Get()
