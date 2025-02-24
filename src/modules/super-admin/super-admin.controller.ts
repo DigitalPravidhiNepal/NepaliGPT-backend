@@ -55,14 +55,6 @@ export class SuperAdminController {
   }
 
 
-  @Get('all-bots')
-  @Roles(roleType.superAdmin, roleType.customer)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all bots' })
-  findAllBots() {
-    return this.superAdminService.getBots();
-  }
 
   // // Delete Super Admin
   // @Delete('delete-super-admin/:id')

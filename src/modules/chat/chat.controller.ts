@@ -42,6 +42,15 @@ export class ChatController {
     return this.chatService.findOne(+id);
   }
 
+  @Get('all-bots')
+  @Roles(roleType.superAdmin, roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all bots' })
+  findAllBots() {
+    return this.chatService.getBots();
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto) {
     return this.chatService.update(+id, updateChatDto);

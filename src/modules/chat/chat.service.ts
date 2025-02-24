@@ -62,6 +62,14 @@ export class ChatService {
     }
   }
 
+  async getBots() {
+    try {
+      return await this.botRepository.find();
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+
+  }
   findOne(id: number) {
     return `This action returns a #${id} chat`;
   }
