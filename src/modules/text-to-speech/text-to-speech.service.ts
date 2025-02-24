@@ -99,15 +99,35 @@ export class TextToSpeechService {
     try {
       const tts = await this.ttsRepository.findOne({ where: { id } });
       if (!tts) {
-        throw new NotFoundException("Template not found");
+        throw new NotFoundException("Speech not found");
       }
 
       if (tts.status === true) {
-        throw new BadRequestException("Code has already been saved.");
+        throw new BadRequestException("Speech has already been saved.");
       }
 
       tts.status = true;
-      tts.user = { id: userId } as userEntity;
+
+      return await this.ttsRepository.save(tts);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
+  async unsave(id: string) {
+    try {
+      const tts = await this.ttsRepository.findOne({ where: { id } });
+      if (!tts) {
+        throw new NotFoundException("Speech not found");
+      }
+
+      if (tts.status === false) {
+        throw new BadRequestException("Speech has already been removed.");
+      }
+
+      tts.status = false;
 
       return await this.ttsRepository.save(tts);
     } catch (e) {

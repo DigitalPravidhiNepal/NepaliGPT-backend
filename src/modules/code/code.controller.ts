@@ -43,8 +43,6 @@ export class CodeController {
   }
 
 
-
-
   @Patch('save/:id')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
@@ -56,7 +54,10 @@ export class CodeController {
 
 
   @Delete(':id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   remove(@Param('id') id: string) {
-    return this.codeService.remove(+id);
+    return this.codeService.remove(id);
   }
 }

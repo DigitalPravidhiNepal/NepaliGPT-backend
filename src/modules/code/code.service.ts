@@ -86,7 +86,27 @@ export class CodeService {
       }
 
       code.status = true;
-      code.user = { id: userId } as userEntity;
+
+      return await this.codeRepository.save(code);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
+  async unsave(id: string) {
+    try {
+      const code = await this.codeRepository.findOne({ where: { id } });
+      if (!code) {
+        throw new NotFoundException("Code not found");
+      }
+
+      if (code.status === false) {
+        throw new BadRequestException("Code has already been removed");
+      }
+
+      code.status = false;
 
       return await this.codeRepository.save(code);
     } catch (e) {
@@ -98,7 +118,15 @@ export class CodeService {
 
 
 
-  remove(id: number) {
-    return `This action removes a #${id} code`;
+  async remove(id: string) {
+    try {
+      const code = await this.codeRepository.findOne({ where: { id } });
+      if (!code) {
+        throw new NotFoundException("code not found");
+      }
+      return await this.codeRepository.remove(code);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }

@@ -109,6 +109,24 @@ export class TemplatesService {
     }
   }
 
+  async unsave(id: string) {
+    try {
+      const template = await this.templateRepo.findOne({ where: { id } });
+      if (!template) {
+        throw new NotFoundException("Template not found");
+      }
+      if (template.status === false) {
+        throw new BadRequestException("Template has already been removed");
+      }
+      template.status = false;
+      return await this.templateRepo.save(template);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
   //get all templates
   async findAll() {
     try {

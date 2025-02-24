@@ -100,15 +100,14 @@ export class SpeechToTextService {
     try {
       const stt = await this.sttRepository.findOne({ where: { id } });
       if (!stt) {
-        throw new NotFoundException("Template not found");
+        throw new NotFoundException("Transcription not found");
       }
 
       if (stt.status === true) {
-        throw new BadRequestException("Code has already been saved.");
+        throw new BadRequestException("Transcription has already been saved.");
       }
 
       stt.status = true;
-      stt.user = { id: userId } as userEntity;
 
       return await this.sttRepository.save(stt);
     } catch (e) {
@@ -117,6 +116,29 @@ export class SpeechToTextService {
         : new BadRequestException(e.message);
     }
   }
+
+  async unsave(id: string) {
+    try {
+      const stt = await this.sttRepository.findOne({ where: { id } });
+      if (!stt) {
+        throw new NotFoundException("Transcription not found");
+      }
+
+      if (stt.status === false) {
+        throw new BadRequestException("Transcription has already been removed.");
+      }
+
+      stt.status = false;
+
+      return await this.sttRepository.save(stt);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
+
 
 }
 
