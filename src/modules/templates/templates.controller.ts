@@ -57,6 +57,14 @@ export class TemplatesController {
     return this.templatesService.updateStatus(id, userId);
   }
 
+  @Patch('unsave/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  unsave(@Param('id') id: string) {
+    return this.templatesService.unsave(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.templatesService.remove(+id);

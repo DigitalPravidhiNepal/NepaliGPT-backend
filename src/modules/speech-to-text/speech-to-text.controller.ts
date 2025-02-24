@@ -77,6 +77,14 @@ export class SpeechToTextController {
     return this.speechToTextService.updateStatus(id, userId);
   }
 
+  @Patch('unsave/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  unsave(@Param('id') id: string) {
+    return this.speechToTextService.unsave(id);
+  }
+
   // @Delete(':id')
   // remove(@Param('id') id: string) {
   //   return this.speechToTextService.remove(+id);

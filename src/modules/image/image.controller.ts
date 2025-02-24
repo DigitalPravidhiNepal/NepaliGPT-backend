@@ -58,6 +58,14 @@ export class ImageController {
     return this.imageService.updateStatus(id, userId);
   }
 
+  @Patch('unsave/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  unsave(@Param('id') id: string) {
+    return this.imageService.unsave(id);
+  }
+
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {

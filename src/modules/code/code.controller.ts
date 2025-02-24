@@ -52,6 +52,15 @@ export class CodeController {
     return this.codeService.updateStatus(id, userId);
   }
 
+  @Patch('unsave/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  unsave(@Param('id') id: string) {
+    return this.codeService.unsave(id);
+  }
+
+
 
   @Delete(':id')
   @Roles(roleType.customer)
