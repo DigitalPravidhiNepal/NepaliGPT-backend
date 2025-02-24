@@ -74,6 +74,27 @@ export class ImageService {
   //   return `This action updates a #${id} image`;
   // }
 
+  //update status as true for saving
+  async updateStatus(id: string, userId: string) {
+    try {
+      const image = await this.imageRepository.findOne({ where: { id } });
+      if (!image) {
+        throw new NotFoundException("Template not found");
+      }
+      if (image.status === true) {
+        return new BadRequestException("Image have been saved already");
+      }
+      image.status = true;
+      image.user = { id: userId } as userEntity;
+      return await this.imageRepository.save(image);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
+
   remove(id: number) {
     return `This action removes a #${id} image`;
   }

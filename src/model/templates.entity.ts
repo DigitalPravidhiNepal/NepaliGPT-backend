@@ -1,6 +1,7 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { parentEntity } from ".";
 import { AccessType } from "src/helper/types/index.type";
+import { userEntity } from "./user.entity";
 @Entity('Template')
 export class templateEntity extends parentEntity {
     @Column()
@@ -20,4 +21,10 @@ export class templateEntity extends parentEntity {
 
     @Column()
     promptTemplate: string;
+
+    @Column({ default: false })
+    status: boolean;
+
+    @ManyToOne(() => userEntity, (user) => user.image)
+    user: userEntity;
 }

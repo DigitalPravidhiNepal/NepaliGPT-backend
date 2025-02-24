@@ -158,3 +158,11 @@ export enum Creativity {
     HIGH = 'high'
 }
 
+export enum DocumentName {
+    Template = 'Template',
+    Image = 'Image',
+    Code = 'Code',
+    SpeechToText = 'SpeechToText',
+    TextToSpeech = 'TextToSpeech',
+}
+

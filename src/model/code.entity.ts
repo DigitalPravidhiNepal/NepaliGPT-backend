@@ -17,6 +17,9 @@ export class codeEntity extends parentEntity {
     @Column()
     code: string;
 
+    @Column({ default: false })
+    status: boolean;
+
     @ManyToOne(() => userEntity, (user) => user.code)
     user: userEntity;
 

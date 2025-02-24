@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import OpenAI from 'openai';
+import { Roles } from 'src/middlewares/authorisation/roles.decorator';
+import { roleType } from 'src/helper/types/index.type';
+import { AtGuard } from 'src/middlewares/access_token/at.guard';
+import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 
 @Controller('templates')
 @ApiTags('Templates')
@@ -26,8 +30,12 @@ export class TemplatesController {
   }
 
   @Post('generate/:id')
-  generate(@Param('id') id: string, @Body() GenerateDto: generateDto) {
-    return this.templatesService.generate(id, GenerateDto);
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  generate(@Req() req: any, @Param('id') id: string, @Body() GenerateDto: generateDto) {
+    const userId = req.user.sub;
+    return this.templatesService.generate(id, GenerateDto, userId);
   }
 
   @Get()
@@ -40,9 +48,13 @@ export class TemplatesController {
     return this.templatesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTemplateDto: UpdateTemplateDto) {
-    return this.templatesService.update(+id, updateTemplateDto);
+  @Patch('save/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  update(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user.sub;
+    return this.templatesService.updateStatus(id, userId);
   }
 
   @Delete(':id')

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import OpenAI from 'openai';
 import * as fs from 'fs';
@@ -94,4 +94,28 @@ export class TextToSpeechService {
       throw new BadRequestException(e.message);
     }
   }
+
+  async updateStatus(id: string, userId: string) {
+    try {
+      const tts = await this.ttsRepository.findOne({ where: { id } });
+      if (!tts) {
+        throw new NotFoundException("Template not found");
+      }
+
+      if (tts.status === true) {
+        throw new BadRequestException("Code has already been saved.");
+      }
+
+      tts.status = true;
+      tts.user = { id: userId } as userEntity;
+
+      return await this.ttsRepository.save(tts);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
 }
+

@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, FileTypeValidator, ParseFilePipe, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, FileTypeValidator, ParseFilePipe, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
-import { roleType } from 'src/helper/types/index.type';
+import { DocumentName, roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
@@ -33,6 +33,15 @@ export class UserController {
   @ApiBearerAuth('access-token')
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Get('saved')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  findAllSaved(@Req() req: any, @Query('document') document: DocumentName) {
+    const id = req.user.sub;
+    return this.userService.savedDocuments(id, document);
   }
 
   @Get('get-info')

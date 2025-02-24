@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSpeechToTextDto } from './dto/create-speech-to-text.dto';
 import OpenAI from 'openai';
 import axios from 'axios';
@@ -95,6 +95,29 @@ export class SpeechToTextService {
       throw new BadRequestException(e.message);
     }
   }
+
+  async updateStatus(id: string, userId: string) {
+    try {
+      const stt = await this.sttRepository.findOne({ where: { id } });
+      if (!stt) {
+        throw new NotFoundException("Template not found");
+      }
+
+      if (stt.status === true) {
+        throw new BadRequestException("Code has already been saved.");
+      }
+
+      stt.status = true;
+      stt.user = { id: userId } as userEntity;
+
+      return await this.sttRepository.save(stt);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
+  }
+
 }
 
 // Function to download the audio file from Cloudinary

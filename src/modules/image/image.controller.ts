@@ -49,6 +49,16 @@ export class ImageController {
     return this.imageService.findOne(+id);
   }
 
+  @Patch('save/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  update(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user.sub;
+    return this.imageService.updateStatus(id, userId);
+  }
+
+
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
   //   return this.imageService.update(+id, updateImageDto);

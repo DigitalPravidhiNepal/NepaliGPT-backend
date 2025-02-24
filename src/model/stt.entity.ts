@@ -17,6 +17,9 @@ export class sttEntity extends parentEntity {
     @Column()
     transcription: string;
 
+    @Column({ default: false })
+    status: boolean;
+
     @ManyToOne(() => userEntity, (user) => user.stt)
     user: userEntity;
 

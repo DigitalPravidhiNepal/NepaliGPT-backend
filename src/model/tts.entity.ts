@@ -10,6 +10,9 @@ export class ttsEntity extends parentEntity {
     @Column()
     audio: string;
 
+    @Column({ default: false })
+    status: boolean;
+
     @ManyToOne(() => userEntity, (user) => user.chat)
     user: userEntity;
 

@@ -42,10 +42,15 @@ export class CodeController {
     return this.codeService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCodeDto: UpdateCodeDto) {
-    return this.codeService.update(+id, updateCodeDto);
+  @Patch('save/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  update(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user.sub;
+    return this.codeService.updateStatus(id, userId);
   }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

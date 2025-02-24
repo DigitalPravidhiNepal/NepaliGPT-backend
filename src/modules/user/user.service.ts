@@ -1,16 +1,33 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { userEntity } from 'src/model/user.entity';
 import { Repository } from 'typeorm';
 import { TransformationType } from 'class-transformer';
+import { codeEntity } from 'src/model/code.entity';
+import { imageEntity } from 'src/model/image.entity';
+import { sttEntity } from 'src/model/stt.entity';
+import { templateEntity } from 'src/model/templates.entity';
+import { ttsEntity } from 'src/model/tts.entity';
+import { DocumentName } from 'src/helper/types/index.type';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(userEntity)
-    private readonly userRepository: Repository<userEntity>
+    private readonly userRepository: Repository<userEntity>,
+    @InjectRepository(templateEntity)
+    private readonly templateRepo: Repository<templateEntity>,
+    @InjectRepository(imageEntity)
+    private imageRepository: Repository<imageEntity>,
+    @InjectRepository(codeEntity)
+    private codeRepository: Repository<codeEntity>,
+
+    @InjectRepository(sttEntity)
+    private readonly sttRepository: Repository<sttEntity>,
+    @InjectRepository(ttsEntity)
+    private readonly ttsRepository: Repository<ttsEntity>
   ) { }
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
@@ -22,6 +39,28 @@ export class UserService {
       return user;
     } catch (e) {
       throw new BadRequestException("No users ");
+    }
+  }
+
+
+  async savedDocuments(id: string, documentName: DocumentName) {
+    try {
+      switch (documentName) {
+        case DocumentName.Template:
+          return await this.templateRepo.find({ where: { status: true, user: { id } } });
+        case DocumentName.Image:
+          return await this.imageRepository.find({ where: { status: true, user: { id } } });
+        case DocumentName.Code:
+          return await this.codeRepository.find({ where: { status: true, user: { id } } });
+        case DocumentName.SpeechToText:
+          return await this.sttRepository.find({ where: { status: true, user: { id } } });
+        case DocumentName.TextToSpeech:
+          return await this.ttsRepository.find({ where: { status: true, user: { id } } });
+        default:
+          return new NotFoundException("Invalid document");
+      }
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
   }
 

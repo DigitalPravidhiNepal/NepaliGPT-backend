@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,9 +72,29 @@ export class CodeService {
     }
   }
 
-  update(id: number, updateCodeDto: UpdateCodeDto) {
-    return `This action updates a #${id} code`;
+  async updateStatus(id: string, userId: string) {
+    try {
+      const code = await this.codeRepository.findOne({ where: { id } });
+      if (!code) {
+        throw new NotFoundException("Template not found");
+      }
+
+      if (code.status === true) {
+        throw new BadRequestException("Code has already been saved.");
+      }
+
+      code.status = true;
+      code.user = { id: userId } as userEntity;
+
+      return await this.codeRepository.save(code);
+    } catch (e) {
+      throw e instanceof NotFoundException || e instanceof BadRequestException
+        ? e
+        : new BadRequestException(e.message);
+    }
   }
+
+
 
   remove(id: number) {
     return `This action removes a #${id} code`;

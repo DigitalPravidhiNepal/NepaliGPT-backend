@@ -11,6 +11,9 @@ export class imageEntity extends parentEntity {
     @Column()
     image: string;
 
+    @Column({ default: false })
+    status: boolean;
+
     @ManyToOne(() => userEntity, (user) => user.image)
     user: userEntity;
 

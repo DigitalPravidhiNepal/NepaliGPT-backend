@@ -6,7 +6,7 @@ import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
-import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('text-to-speech')
 @ApiTags('Text to Speech')
@@ -40,10 +40,15 @@ export class TextToSpeechController {
   //   return this.textToSpeechService.findOne(+id);
   // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTextToSpeechDto: UpdateTextToSpeechDto) {
-  //   return this.textToSpeechService.update(+id, updateTextToSpeechDto);
-  // }
+  @Patch('save/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  update(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user.sub;
+    return this.textToSpeechService.updateStatus(id, userId);
+  }
+
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

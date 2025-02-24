@@ -7,6 +7,7 @@ import { chatEntity } from "./chat.entity";
 import { sttEntity } from "./stt.entity";
 import { ttsEntity } from "./tts.entity";
 import { subscriptionEntity } from "./subscription.entity";
+import { templateEntity } from "./templates.entity";
 
 @Entity('user')
 export class userEntity extends parentEntity {
@@ -45,5 +46,8 @@ export class userEntity extends parentEntity {
     tts: ttsEntity[];
 
     @OneToMany(() => subscriptionEntity, (subscription) => subscription.user)
-    subscription: subscriptionEntity[]
+    subscription: subscriptionEntity[];
+
+    @OneToMany(() => templateEntity, (template) => template.user)
+    template: ttsEntity[];
 }
