@@ -47,6 +47,7 @@ export class CodeController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'save codes' })
   update(@Req() req: any, @Param('id') id: string) {
     const userId = req.user.sub;
     return this.codeService.updateStatus(id, userId);
@@ -56,6 +57,7 @@ export class CodeController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'unsave codes' })
   unsave(@Param('id') id: string) {
     return this.codeService.unsave(id);
   }
@@ -66,6 +68,7 @@ export class CodeController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'delete codes' })
   remove(@Param('id') id: string) {
     return this.codeService.remove(id);
   }

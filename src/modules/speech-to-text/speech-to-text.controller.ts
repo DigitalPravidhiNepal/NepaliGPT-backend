@@ -57,6 +57,7 @@ export class SpeechToTextController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'get all transcriptions' })
   findAll(@Req() req: any) {
     const id = req.user.sub;
     return this.speechToTextService.findAll(id);
@@ -72,6 +73,7 @@ export class SpeechToTextController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'save transcriptions' })
   update(@Req() req: any, @Param('id') id: string) {
     const userId = req.user.sub;
     return this.speechToTextService.updateStatus(id, userId);
@@ -81,6 +83,7 @@ export class SpeechToTextController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'unsave transcriptions' })
   unsave(@Param('id') id: string) {
     return this.speechToTextService.unsave(id);
   }

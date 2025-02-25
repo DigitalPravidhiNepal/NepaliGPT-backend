@@ -53,6 +53,7 @@ export class ImageController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'save image' })
   update(@Req() req: any, @Param('id') id: string) {
     const userId = req.user.sub;
     return this.imageService.updateStatus(id, userId);
@@ -62,6 +63,7 @@ export class ImageController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'unsave image' })
   unsave(@Param('id') id: string) {
     return this.imageService.unsave(id);
   }

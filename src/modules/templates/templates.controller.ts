@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } fro
 import { TemplatesService } from './templates.service';
 import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import OpenAI from 'openai';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
@@ -33,6 +33,7 @@ export class TemplatesController {
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'generate content from template' })
   generate(@Req() req: any, @Param('id') id: string, @Body() GenerateDto: generateDto) {
     const userId = req.user.sub;
     return this.templatesService.generate(id, GenerateDto, userId);

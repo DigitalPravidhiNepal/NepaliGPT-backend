@@ -8,6 +8,7 @@ import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 
+
 @Controller('chat')
 @ApiTags('chat')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
@@ -15,7 +16,8 @@ import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 @ApiResponse({ status: 400, description: 'Bad request' })
 @ApiResponse({ status: 500, description: 'Server Error' })
 export class ChatController {
-  constructor(private readonly chatService: ChatService) { }
+  constructor(private readonly chatService: ChatService
+  ) { }
 
   @Post()
   @Roles(roleType.customer)
@@ -27,6 +29,14 @@ export class ChatController {
     return this.chatService.chat(createChatDto, sub);
   }
 
+  @Get('all-bots')
+  @Roles(roleType.superAdmin, roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all bots' })
+  findAllBots() {
+    return this.chatService.getBots();
+  }
   @Get('get-chats/:id')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
@@ -42,14 +52,7 @@ export class ChatController {
     return this.chatService.findOne(+id);
   }
 
-  @Get('all-bots')
-  @Roles(roleType.superAdmin, roleType.customer)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all bots' })
-  findAllBots() {
-    return this.chatService.getBots();
-  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto) {

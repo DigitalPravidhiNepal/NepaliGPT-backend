@@ -64,7 +64,8 @@ export class ChatService {
 
   async getBots() {
     try {
-      return await this.botRepository.find();
+      const bots = await this.botRepository.find();
+      return bots;
     } catch (e) {
       throw new BadRequestException(e.message);
     }
