@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateBotDto, CreateSuperAdminDto } from './dto/create-super-admin.dto';
+import { CreateBotDto, CreateSuperAdminDto, UpdateBotDto } from './dto/create-super-admin.dto';
 import { UpdateSuperAdminDto } from './dto/update-super-admin.dto';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import { DataSource, Repository } from 'typeorm';
@@ -72,13 +72,7 @@ export class SuperAdminService {
     }
   }
 
-  async getBots() {
-    try {
-      return await this.botRepository.find();
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
+
 
   async updateAvatar(id: string, photo: string) {
     try {
@@ -86,6 +80,28 @@ export class SuperAdminService {
       bot.photo = photo;
       await this.botRepository.save(bot);
       return true
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+
+  }
+
+  async updateBot(id: string, updateBotDTO: UpdateBotDto) {
+    try {
+      const bot = await this.botRepository.findOne({ where: { id } });
+      const updatedBot = Object.assign(bot, updateBotDTO);
+      await this.botRepository.save(updatedBot);
+      return true;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+
+  }
+
+  async deleteBot(id: string) {
+    try {
+      const bot = await this.botRepository.findOne({ where: { id } });
+      return await this.botRepository.remove(bot);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -100,11 +116,6 @@ export class SuperAdminService {
   //   return await this.authRepository.remove(existingAdmin);
   // }
 
-
-  // async deleteRestaurant(id: UUID): Promise<restaurantEntity> {
-  //   const existingRestaurant = await this.restaurantRepository.findOne({ where: { id } });
-  //   return await this.restaurantRepository.remove(existingRestaurant);
-  // }
 
   async findAllUser(paginationDto?: PaginationDto) {
     try {

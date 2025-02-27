@@ -8,7 +8,7 @@ import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { packageEntity } from 'src/model/package.entity';
 import { UUID } from 'crypto';
-import { CreateBotDto, CreateSuperAdminDto } from './dto/create-super-admin.dto';
+import { CreateBotDto, CreateSuperAdminDto, UpdateBotDto, UpdatePhotoDto } from './dto/create-super-admin.dto';
 import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
 import { PaginationDto } from 'src/helper/utils/pagination.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -55,7 +55,53 @@ export class SuperAdminController {
   }
 
 
+  // Update pacakge
+  @Patch('update-botInfo/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'update bot info' })
+  async updateBot(
+    @Param('id') id: string,
+    @Body() updateBotDTO: UpdateBotDto,
+  ) {
+    return this.superAdminService.updateBot(id, updateBotDTO);
+  }
 
+  // Update bot image
+  @Patch('update-photo/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'update avatar of bot' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('photo'))
+  async updateAvatar(
+    @Param('id') id: string,
+    @Body() updatePhotoDto: UpdatePhotoDto, @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [
+          // new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg|webp)/ }),
+        ],
+      }),
+    )
+    file?: Express.Multer.File) {
+    const s3response = updatePhotoDto.photo ? updatePhotoDto.photo : await this.uploadService.upload(file);
+    return this.superAdminService.updateAvatar(id, s3response);
+  }
+
+  //delete Bot
+
+  @Delete('delete-bot/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'delete bot' })
+  deleteBot(@Param('id') id: string) {
+    return this.superAdminService.deleteBot(id);
+  }
   // // Delete Super Admin
   // @Delete('delete-super-admin/:id')
   // @Roles(roleType.superAdmin)
@@ -75,15 +121,6 @@ export class SuperAdminController {
     return this.superAdminService.findAllUser(paginationDto);
   }
 
-  // // Update Restaurant Status
-  // @Patch('restaurant-account')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'update restaurant status' })
-  // updateRestaurantStatus(@Body() data: updateRestaurant) {
-  //   return this.superAdminService.updateRestaurantStatus(data);
-  // }
 
   // Create a new package
   @Post('create-package')
@@ -104,16 +141,6 @@ export class SuperAdminController {
   async findAll(): Promise<packageEntity[]> {
     return this.superAdminService.findAllPackage();
   }
-
-  // // Get all pacakges by id
-  // @Get('get-packages/:id')
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({ summary: 'get all pacakges' })
-  // async findAllById(@Param('id', ParseUUIDPipe) id: UUID): Promise<packageEntity> {
-  //   return this.superAdminService.findAllPackageById(id);
-  // }
 
   // Update pacakge
   @Patch('update-packages/:id')

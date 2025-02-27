@@ -36,6 +36,23 @@ export class CreateBotDto {
     photo?: any;
 }
 
+export class UpdateBotDto {
+    @IsString()
+    @ApiProperty()
+    @IsOptional()
+    name: string;
+
+    @IsString()
+    @ApiProperty()
+    @IsOptional()
+    role: string;
+
+    @IsString()
+    @ApiProperty()
+    @IsOptional()
+    instructions: string;
+}
+
 export class UpdatePhotoDto {
     @ApiProperty({ required: false, type: 'string', format: 'binary' })
     @IsOptional()

@@ -29,14 +29,6 @@ export class ChatController {
     return this.chatService.chat(createChatDto, sub);
   }
 
-  @Get('all-bots')
-  @Roles(roleType.superAdmin, roleType.customer)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all bots' })
-  findAllBots() {
-    return this.chatService.getBots();
-  }
   @Get('get-chats/:id')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
@@ -45,6 +37,16 @@ export class ChatController {
   findAll(@Req() req: any, @Param('id') BotId: string) {
     const id = req.user.sub;
     return this.chatService.findAll(id, BotId);
+  }
+
+
+  @Get('all-bots')
+  @Roles(roleType.superAdmin, roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all bots' })
+  findAllBots() {
+    return this.chatService.getBots();
   }
 
   @Get(':id')
