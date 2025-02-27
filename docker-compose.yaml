@@ -1,11 +1,11 @@
-version: '3.9'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3030:3030'
+      - "3030:3030"  # Ensure ports are properly formatted as a list of strings
     env_file:
       - .env
     depends_on:
@@ -16,8 +16,18 @@ services:
     container_name: postgres-container
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 8552
-      POSTGRES_DB: NepaliGPT
+     POSTGRES_USER: ${PG_USER}
+     POSTGRES_PASSWORD: ${PG_PASSWORD}
+     POSTGRES_DB: ${PG_Database}
     ports:
-      - '5432:5432'
+      - "5432:5432"  # Ensure it's inside quotes and formatted correctly
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+volumes:
+  postgres_data:

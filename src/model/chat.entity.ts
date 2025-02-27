@@ -11,9 +11,6 @@ export class chatEntity extends parentEntity {
     @Column()
     response: string;
 
-    @Column({ default: false })
-    status: boolean;
-
     @ManyToOne(() => userEntity, (user) => user.chat)
     user: userEntity;
 
