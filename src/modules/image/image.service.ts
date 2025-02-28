@@ -6,12 +6,14 @@ import { Repository } from 'typeorm';
 import { imageEntity } from 'src/model/image.entity';
 import { userEntity } from 'src/model/user.entity';
 import { Images } from 'openai/resources';
+import { UploadService } from 'src/helper/utils/files_upload';
 @Injectable()
 export class ImageService {
   constructor(
     private openai: OpenAI,
     @InjectRepository(imageEntity)
-    private imageRepository: Repository<imageEntity>
+    private imageRepository: Repository<imageEntity>,
+    private uploadService: UploadService
   ) {
     // Initialize OpenAI API client
     this.openai = new OpenAI({
@@ -38,19 +40,22 @@ export class ImageService {
       });
 
       // Get the URL of the generated image
-      const imageUrl = response.data[0].url
-      if (imageUrl && id) {
+      const imageUrl = response.data[0].url;
+      const savedImage = await this.uploadService.upload(imageUrl);
+      if (savedImage && id) {
         const Images = new imageEntity();
-        Images.image = imageUrl;
+        Images.image = savedImage;
         Images.prompt = fullPrompt;
         Images.user = { id } as userEntity;
-        await this.imageRepository.save(Images);
+        const savedImages = await this.imageRepository.save(Images);
+        return {
+          id: savedImages.id,
+          image: savedImages.image, // Return the image URL
+          success: true
+        };
+
       }
 
-      return {
-        image: imageUrl, // Return the image URL
-        success: true
-      };
 
     } catch (error) {
       throw new BadRequestException(error.response?.data || 'Error generating image');

@@ -50,28 +50,49 @@ export class UploadService {
    * @param file The file to upload (Multer file object).
    * @returns The URL of the uploaded file.
    */
-  async upload(file: Express.Multer.File): Promise<string> {
-    if (!file) {
-      throw new Error('No file uploaded');
+  async upload(fileOrUrl: string | Express.Multer.File): Promise<string> {
+    // If the input is a file buffer (Multer file), upload it to Cloudinary
+    if (fileOrUrl instanceof Object && 'buffer' in fileOrUrl) {
+      const file = fileOrUrl as Express.Multer.File;
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: 'uploads', // Cloudinary folder
+            resource_type: 'auto', // Automatically detect file type
+          },
+          (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+            if (error) {
+              console.error('Cloudinary upload error:', error);
+              reject(new Error(`Cloudinary upload error: ${error.message}`));
+            } else {
+              console.log('Cloudinary upload result:', result);
+              resolve(result.secure_url); // Return the URL of the uploaded file
+            }
+          }
+        ).end(file.buffer); // Upload the file buffer to Cloudinary
+      });
     }
 
-    // Return the URL after uploading to Cloudinary
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          folder: 'uploads',
-          resource_type: 'auto', // Automatically detect file type (audio, video, etc.)
-        },  // Cloudinary folder for storing uploaded files
-        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error);
-            reject(new Error(`Cloudinary upload error: ${error.message}`));
-          } else {
-            console.log('Cloudinary upload result:', result);
-            resolve(result.secure_url);  // Return the URL of the uploaded file
+    // If the input is a URL, upload the image from the URL
+    if (typeof fileOrUrl === 'string') {
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(
+          fileOrUrl, // Use the URL to upload
+          {
+            folder: 'uploads',
+            resource_type: 'auto',
+          },
+          (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+            if (error) {
+              console.error('Cloudinary upload error:', error);
+              reject(new Error(`Cloudinary upload error: ${error.message}`));
+            } else {
+              console.log('Cloudinary upload result:', result);
+              resolve(result.secure_url); // Return the URL of the uploaded image
+            }
           }
-        },
-      ).end(file.buffer);  // Upload the file buffer to Cloudinary
-    });
+        );
+      });
+    }
   }
 }

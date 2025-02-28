@@ -11,6 +11,7 @@ import { sttEntity } from 'src/model/stt.entity';
 import { templateEntity } from 'src/model/templates.entity';
 import { ttsEntity } from 'src/model/tts.entity';
 import { DocumentName } from 'src/helper/types/index.type';
+import { authEntity } from 'src/model/auth.entity';
 
 @Injectable()
 export class UserService {
@@ -66,10 +67,17 @@ export class UserService {
 
   async findOne(id: string) {
     try {
-      const user = await this.userRepository.findOne({ where: { id } });
+      const user = await this.userRepository.findOne({
+        where: { id }, relations: ['auth'],
+        select: {
+          id: true,
+          auth: { email: true },
+          name: true, phone: true, photo: true, country: true, isActive: true
+        }
+      });
       return user;
     } catch (e) {
-      throw new BadRequestException("user doesn't exist");
+      throw new BadRequestException(e.message);
     }
   }
 
