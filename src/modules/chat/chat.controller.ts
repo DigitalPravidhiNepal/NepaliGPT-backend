@@ -61,8 +61,13 @@ export class ChatController {
     return this.chatService.update(+id, updateChatDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chatService.remove(+id);
+  @Delete(':BotId')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Delete chat with particular bot' })
+  remove(@Param('BotId') BotId: string, @Req() req: any) {
+    const id = req.user.sub;
+    return this.chatService.remove(BotId, id);
   }
 }

@@ -79,7 +79,12 @@ export class ChatService {
     return `This action updates a #${id} chat`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  async remove(botId: string, id: string) {
+    try {
+      const chat = await this.chatRepository.find({ where: { user: { id }, bot: { id: botId } } });
+      return this.chatRepository.remove(chat);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }

@@ -49,7 +49,7 @@ export class UserController {
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   findOne(@Req() req: any) {
-    const { id } = req.user;
+    const id = req.user.sub;
     return this.userService.findOne(id);
   }
 
