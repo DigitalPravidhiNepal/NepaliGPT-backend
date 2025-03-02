@@ -62,7 +62,7 @@ export class ImageService {
       if (savedImage && id) {
         const Images = new imageEntity();
         Images.image = savedImage;
-        Images.prompt = fullPrompt;
+        Images.prompt = title;
         Images.user = { id } as userEntity;
         const savedImages = await this.imageRepository.save(Images);
         return {
@@ -81,7 +81,7 @@ export class ImageService {
 
   async findAll(id: string) {
     try {
-      const images = await this.imageRepository.find({ where: { user: { id } }, select: { id: true, createdAt: true, image: true } });
+      const images = await this.imageRepository.find({ where: { user: { id } }, select: { id: true, createdAt: true, image: true, prompt: true } });
       return images;
     } catch (e) {
       throw new BadRequestException(e.message);

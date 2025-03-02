@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { parentEntity } from ".";
 import { AccessType } from "src/helper/types/index.type";
 import { userEntity } from "./user.entity";
 import { FieldDto } from "src/modules/templates/dto/create-template.dto";
+import { contentEntity } from "./content.entity";
 @Entity('Template')
 export class templateEntity extends parentEntity {
     @Column()
@@ -29,8 +30,8 @@ export class templateEntity extends parentEntity {
     @Column({ default: false })
     status: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.image)
-    user: userEntity;
+    @OneToMany(() => contentEntity, (content) => content.template)
+    contents: contentEntity[];
 
 
 }

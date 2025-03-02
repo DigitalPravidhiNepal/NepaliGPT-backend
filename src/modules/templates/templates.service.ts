@@ -8,6 +8,7 @@ import OpenAI from 'openai';
 import { ConfigService } from '@nestjs/config';
 import { userEntity } from 'src/model/user.entity';
 import { TransformationType } from 'class-transformer';
+import { contentEntity } from 'src/model/content.entity';
 
 @Injectable()
 export class TemplatesService {
@@ -15,6 +16,8 @@ export class TemplatesService {
   constructor(
     @InjectRepository(templateEntity)
     private readonly templateRepo: Repository<templateEntity>,
+    @InjectRepository(contentEntity)
+    private readonly contentRepo: Repository<contentEntity>,
     private configService: ConfigService,
 
   ) {
@@ -59,6 +62,8 @@ export class TemplatesService {
 
       // Append language instruction
       finalPrompt += ` (Write in ${language} language.)`;
+      console.log(finalPrompt);
+
 
       // Convert creativity to OpenAI temperature value
       const temperatureMapping: Record<string, number> = {

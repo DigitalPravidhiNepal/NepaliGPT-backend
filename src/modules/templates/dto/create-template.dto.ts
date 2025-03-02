@@ -31,6 +31,8 @@ export class CreateTemplateDto {
     @ApiProperty()
     category: string; // e.g., 'Blog', 'Text', 'Social'
 
+
+    @IsArray()
     @ValidateNested({ each: true })
     @Type(() => FieldDto)
     fields: FieldDto[];
