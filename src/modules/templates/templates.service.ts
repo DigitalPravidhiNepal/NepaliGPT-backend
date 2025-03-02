@@ -32,7 +32,7 @@ export class TemplatesService {
       template.pricing = pricing;
       template.category = category;
       template.promptTemplate = promptTemplate;
-      template.fields = fields;
+      template.fields = fields
       return await this.templateRepo.save(template)
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -40,21 +40,28 @@ export class TemplatesService {
 
   }
 
-  //generate content
   async generate(id: string, dto: generateDto, userId: string) {
     try {
-      const { maxToken, creativity } = dto;
+      const { maxToken, creativity, language, userInputs } = dto;
+
+      // Fetch the template
       const template = await this.templateRepo.findOne({ where: { id } });
       if (!template) {
         throw new NotFoundException('Template not found');
       }
+
       // Replace placeholders with user-provided values
       let finalPrompt = template.promptTemplate;
-      Object.keys(dto.userInputs).forEach((key) => {
-        finalPrompt = finalPrompt.replace(`{${key}}`, dto.userInputs[key]);
+      Object.keys(userInputs).forEach((key) => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g'); // Match all occurrences
+        finalPrompt = finalPrompt.replace(regex, userInputs[key]);
       });
+
+      // Append language instruction
+      finalPrompt += ` (Write in ${language} language.)`;
+
       // Convert creativity to OpenAI temperature value
-      const temperatureMapping = {
+      const temperatureMapping: Record<string, number> = {
         Low: 0.2,
         Medium: 0.7,
         High: 1.0,
@@ -68,21 +75,22 @@ export class TemplatesService {
         max_tokens: maxToken,
         temperature: temperature,
       });
-      if (response) {
-        // Extract content and remove extra quotes
-        const generatedContent = response.choices
-          .map(choice => choice.message?.content.replace(/^"|"$/g, '')) // Removes leading & trailing quotes
-          .join("\n");
 
-        template.content = generatedContent;
-        template.user = { id: userId } as userEntity;
-        return await this.templateRepo.save(template);
-      }
+      // Extract and process generated content
+      const generatedContent = response.choices
+        .map(choice => choice.message?.content?.trim() ?? '') // Ensure content exists
+        .join("\n");
 
+      // Save generated content
+      template.content = generatedContent;
+      template.user = { id: userId } as userEntity;
+
+      return await this.templateRepo.save(template);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
+
 
   //filter templates by category
   async filterByCategory(categoryName) {

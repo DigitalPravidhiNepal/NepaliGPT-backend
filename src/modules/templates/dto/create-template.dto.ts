@@ -3,12 +3,14 @@ import { Type } from "class-transformer";
 import { IsArray, IsEnum, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
 import { AccessType } from "src/helper/types/index.type";
 
-class FieldDto {
+export class FieldDto {
     @IsString()
+    @ApiProperty()
     name: string;
 
     @IsString()
-    value: string;
+    @ApiProperty()
+    type: string;
 }
 
 export class CreateTemplateDto {
@@ -29,9 +31,6 @@ export class CreateTemplateDto {
     @ApiProperty()
     category: string; // e.g., 'Blog', 'Text', 'Social'
 
-
-    @IsArray()
-    @ApiProperty()
     @ValidateNested({ each: true })
     @Type(() => FieldDto)
     fields: FieldDto[];
@@ -46,6 +45,7 @@ export class CreateTemplateDto {
 export class generateDto {
 
     @IsObject()
+    @ApiProperty()
     userInputs: Record<string, string>; // User-provided values for dynamic fields
 
     @IsString()
@@ -55,6 +55,10 @@ export class generateDto {
     @IsNumber()
     @ApiProperty()
     maxToken: number;
+
+    @IsString()
+    @ApiProperty()
+    language: string;
 
 }
 

@@ -25,9 +25,9 @@ export class TemplatesController {
   }
 
   @Post()
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
+  // @Roles(roleType.superAdmin)
+  // @UseGuards(AtGuard, RolesGuard)
+  // @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'create template by superadmin' })
   create(@Body() createTemplateDto: CreateTemplateDto) {
     return this.templatesService.create(createTemplateDto);
