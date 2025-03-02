@@ -25,13 +25,14 @@ export class TemplatesService {
   //create template
   async create(createTemplateDto: CreateTemplateDto) {
     try {
-      const { name, description, pricing, category, promptTemplate } = createTemplateDto;
+      const { name, description, pricing, category, promptTemplate, fields } = createTemplateDto;
       const template = new templateEntity()
       template.name = name;
       template.description = description;
       template.pricing = pricing;
       template.category = category;
       template.promptTemplate = promptTemplate;
+      template.fields = fields;
       return await this.templateRepo.save(template)
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -40,11 +41,18 @@ export class TemplatesService {
   }
 
   //generate content
-  async generate(id: string, GenerateDto: generateDto, userId: string) {
+  async generate(id: string, dto: generateDto, userId: string) {
     try {
-      const { creativity, tone, inputData, maxToken, language } = GenerateDto;
+      const { maxToken, creativity } = dto;
       const template = await this.templateRepo.findOne({ where: { id } });
-      const { promptTemplate } = template;
+      if (!template) {
+        throw new NotFoundException('Template not found');
+      }
+      // Replace placeholders with user-provided values
+      let finalPrompt = template.promptTemplate;
+      Object.keys(dto.userInputs).forEach((key) => {
+        finalPrompt = finalPrompt.replace(`{${key}}`, dto.userInputs[key]);
+      });
       // Convert creativity to OpenAI temperature value
       const temperatureMapping = {
         Low: 0.2,
@@ -52,14 +60,11 @@ export class TemplatesService {
         High: 1.0,
       };
       const temperature = temperatureMapping[creativity] || 0.7; // Default: Medium
-      // Construct dynamic prompt
-      const prompt = `${promptTemplate} where user inputs are ${inputData} in ${language} 
-    The tone should be ${tone}.`;
 
       // Call OpenAI API
       const response = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: finalPrompt }],
         max_tokens: maxToken,
         temperature: temperature,
       });

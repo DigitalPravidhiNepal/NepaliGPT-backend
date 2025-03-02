@@ -16,15 +16,20 @@ export class templateEntity extends parentEntity {
     @Column()
     category: string; // e.g., 'Blog', 'Text', 'Social'
 
-    @Column({ nullable: true })
-    content: string;
+    @Column('json')
+    fields: { name: string; value: string }[]; // Example: [{name: "topic", type: "text"}]
 
     @Column()
     promptTemplate: string;
+
+    @Column({ default: null })
+    content: string;
 
     @Column({ default: false })
     status: boolean;
 
     @ManyToOne(() => userEntity, (user) => user.image)
     user: userEntity;
+
+
 }

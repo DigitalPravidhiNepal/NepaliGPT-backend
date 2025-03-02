@@ -14,13 +14,15 @@ import { CodeModule } from './modules/code/code.module';
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.module';
 import { TemplatesModule } from './modules/templates/templates.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
     TypeOrmModule.forRoot(databaseConfig),
     AuthModule,
     UserModule,

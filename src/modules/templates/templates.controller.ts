@@ -25,6 +25,10 @@ export class TemplatesController {
   }
 
   @Post()
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ description: 'create template by superadmin' })
   create(@Body() createTemplateDto: CreateTemplateDto) {
     return this.templatesService.create(createTemplateDto);
   }
@@ -34,9 +38,9 @@ export class TemplatesController {
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'generate content from template' })
-  generate(@Req() req: any, @Param('id') id: string, @Body() GenerateDto: generateDto) {
+  generate(@Req() req: any, @Param('id') id: string, @Body() dto: generateDto) {
     const userId = req.user.sub;
-    return this.templatesService.generate(id, GenerateDto, userId);
+    return this.templatesService.generate(id, dto, userId);
   }
 
   @Get()
