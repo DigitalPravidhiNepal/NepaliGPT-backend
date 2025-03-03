@@ -28,9 +28,9 @@ export class TemplatesService {
   //create template
   async create(createTemplateDto: CreateTemplateDto) {
     try {
-      const { name, description, pricing, category, promptTemplate, fields } = createTemplateDto;
+      const { title, description, pricing, category, promptTemplate, fields } = createTemplateDto;
       const template = new templateEntity()
-      template.name = name;
+      template.title = title;
       template.description = description;
       template.pricing = pricing;
       template.category = category;
@@ -153,7 +153,7 @@ export class TemplatesService {
       await this.templateRepo.find({
         select: {
           id: true,
-          name: true,
+          title: true,
           description: true,
           category: true,
         }

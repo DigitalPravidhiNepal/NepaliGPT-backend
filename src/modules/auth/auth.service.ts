@@ -35,16 +35,16 @@ export class AuthService {
     const { email, password } = createAuthDto;
     const authUser = await this.authRepository.findOne({
       where: { email },
-      relations: ['user', 'superAdmin']
+      relations: ['user']
     });
-    if (!authUser) {
+    if (!authUser || authUser.role === roleType.superAdmin) {
       throw new ForbiddenException("User Not found")
     } else {
       const status = await this.hash.verifyHashing(authUser.password, password);
       if (!status) {
         throw new UnauthorizedException("Credential doesn't match");
       }
-      const userId = authUser.superAdmin ? authUser.superAdmin.id : authUser.user.id;
+      const userId = authUser.user.id;
       const tokens = {
         accessToken: await this.token.generateAcessToken({
           sub: userId,
@@ -61,6 +61,38 @@ export class AuthService {
       return tokens;
     }
   }
+
+  async loginAdmin(createAuthDto: CreateAuthDto) {
+    const { email, password } = createAuthDto;
+    const authUser = await this.authRepository.findOne({
+      where: { email },
+      relations: ['superAdmin']
+    });
+    if (!authUser || authUser.role === roleType.customer) {
+      throw new ForbiddenException("User Not found")
+    } else {
+      const status = await this.hash.verifyHashing(authUser.password, password);
+      if (!status) {
+        throw new UnauthorizedException("Credential doesn't match");
+      }
+      const userId = authUser.superAdmin.id;
+      const tokens = {
+        accessToken: await this.token.generateAcessToken({
+          sub: userId,
+          role: authUser.role,
+        }),
+        refreshToken: await this.token.generateRefreshToken({
+          sub: userId,
+          role: authUser.role,
+        }),
+        role: authUser.role,
+      };
+      authUser.rToken = await this.hash.value(tokens.refreshToken);
+      await this.authRepository.save(authUser);
+      return tokens;
+    }
+  }
+
 
   //verify email
   async getVerify(mail: MailDto) {

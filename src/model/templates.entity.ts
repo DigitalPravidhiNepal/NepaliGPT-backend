@@ -7,7 +7,7 @@ import { contentEntity } from "./content.entity";
 @Entity('Template')
 export class templateEntity extends parentEntity {
     @Column()
-    name: string;
+    title: string;
 
     @Column()
     description: string;

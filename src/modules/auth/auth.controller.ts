@@ -21,10 +21,17 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('signin')
-  @ApiOperation({ summary: 'SignIn your Account' })
+  @ApiOperation({ summary: 'SignIn your user Account' })
   login(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.login(createAuthDto)
   }
+
+  @Post('signin-superAdmin')
+  @ApiOperation({ summary: 'SignIn your superAdmin Account' })
+  loginSuperAdmin(@Body() createAuthDto: CreateAuthDto) {
+    return this.authService.loginAdmin(createAuthDto)
+  }
+
 
   //get email for verification
   @Post('get-verify')

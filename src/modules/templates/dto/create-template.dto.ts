@@ -4,9 +4,6 @@ import { IsArray, IsEnum, IsNumber, IsObject, IsString, ValidateNested } from "c
 import { AccessType } from "src/helper/types/index.type";
 
 export class FieldDto {
-    @IsString()
-    @ApiProperty()
-    name: string;
 
     @IsString()
     @ApiProperty()
@@ -25,7 +22,7 @@ export class CreateTemplateDto {
 
     @IsString()
     @ApiProperty()
-    name: string;
+    title: string;
 
     @IsString()
     @ApiProperty()
