@@ -1,13 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsArray, IsEnum, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
-import { AccessType } from "src/helper/types/index.type";
+import { AccessType, category, Creativity, inputType, Language } from "src/helper/types/index.type";
 
 export class FieldDto {
 
-    @IsString()
-    @ApiProperty()
-    type: string;
+    @IsEnum(inputType)
+    @ApiProperty({ enum: inputType })
+    type: inputType;
 
     @IsString()
     @ApiProperty()
@@ -32,9 +32,9 @@ export class CreateTemplateDto {
     @ApiProperty()
     pricing: AccessType;
 
-    @IsString()
-    @ApiProperty()
-    category: string; // e.g., 'Blog', 'Text', 'Social'
+    @IsEnum(category)
+    @ApiProperty({ enum: category })
+    category: category;
 
 
     @IsArray()
@@ -56,17 +56,17 @@ export class generateDto {
     @ApiProperty()
     userInputs: Record<string, string>; // User-provided values for dynamic fields
 
-    @IsString()
-    @ApiProperty()
-    creativity: string;
+    @IsEnum(Creativity)
+    @ApiProperty({ enum: Creativity })
+    creativity: Creativity;
 
     @IsNumber()
     @ApiProperty()
     maxToken: number;
 
-    @IsString()
-    @ApiProperty()
-    language: string;
+    @IsEnum(Language)
+    @ApiProperty({ enum: Language })
+    language: Language;
 
 }
 

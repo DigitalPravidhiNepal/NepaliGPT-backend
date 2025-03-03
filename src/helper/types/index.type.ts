@@ -166,3 +166,46 @@ export enum DocumentName {
     TextToSpeech = 'TextToSpeech',
 }
 
+export enum inputType {
+    TEXT = "text",
+    TEXTAREA = "text-area",
+    NUMBER = "number"
+}
+export enum category {
+    BLOG = "Blog",
+    TEXT = "Text",
+    SOCIAL = "Social",
+    VIDEO = "Video",
+    DISCUSSION = "Discussion",
+    FAQ = "Faq",
+    OTHERS = "Others"
+}
+
+export enum Language {
+    ENGLISH = "English",
+    SPANISH = "Spanish",
+    FRENCH = "French",
+    GERMAN = "German",
+    CHINESE = "Chinese",
+    JAPANESE = "Japanese",
+    HINDI = "Hindi",
+    ARABIC = "Arabic",
+    PORTUGUESE = "Portuguese",
+    RUSSIAN = "Russian",
+    KOREAN = "Korean",
+    ITALIAN = "Italian",
+    DUTCH = "Dutch",
+    TURKISH = "Turkish",
+    SWEDISH = "Swedish",
+    POLISH = "Polish",
+    INDONESIAN = "Indonesian",
+    VIETNAMESE = "Vietnamese",
+    THAI = "Thai",
+    HEBREW = "Hebrew",
+    GREEK = "Greek",
+    DANISH = "Danish",
+    FINNISH = "Finnish",
+    NORWEGIAN = "Norwegian",
+    NEPALI = "Nepali"
+}
+
