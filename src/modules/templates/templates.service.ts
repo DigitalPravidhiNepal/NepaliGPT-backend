@@ -35,7 +35,7 @@ export class TemplatesService {
       template.pricing = pricing;
       template.category = category;
       template.promptTemplate = promptTemplate;
-      template.fields = fields
+      template.fields = fields;
       return await this.templateRepo.save(template)
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -86,11 +86,13 @@ export class TemplatesService {
         .map(choice => choice.message?.content?.trim() ?? '') // Ensure content exists
         .join("\n");
 
-      // Save generated content
-      template.content = generatedContent;
-      template.user = { id: userId } as userEntity;
 
-      return await this.templateRepo.save(template);
+      // Save generated content
+      const Content = new contentEntity();
+      Content.content = generatedContent;
+      Content.user = { id: userId } as userEntity;
+      Content.template = { id } as templateEntity;
+      return await this.contentRepo.save(Content);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -110,16 +112,16 @@ export class TemplatesService {
   //update status as true for saving
   async updateStatus(id: string, userId: string) {
     try {
-      const template = await this.templateRepo.findOne({ where: { id } });
-      if (!template) {
-        throw new NotFoundException("Template not found");
+      const Content = await this.contentRepo.findOne({ where: { id } });
+      if (!Content) {
+        throw new NotFoundException("Content not found");
       }
-      if (template.status === true) {
-        throw new BadRequestException("Template has already been saved");
+      if (Content.status === true) {
+        throw new BadRequestException("Content has already been saved");
       }
-      template.status = true;
-      template.user = { id: userId } as userEntity;
-      return await this.templateRepo.save(template);
+      Content.status = true;
+      Content.user = { id: userId } as userEntity;
+      return await this.templateRepo.save(Content);
     } catch (e) {
       throw e instanceof NotFoundException || e instanceof BadRequestException
         ? e
@@ -129,15 +131,15 @@ export class TemplatesService {
 
   async unsave(id: string) {
     try {
-      const template = await this.templateRepo.findOne({ where: { id } });
-      if (!template) {
-        throw new NotFoundException("Template not found");
+      const content = await this.contentRepo.findOne({ where: { id } });
+      if (!content) {
+        throw new NotFoundException("Content not found");
       }
-      if (template.status === false) {
-        throw new BadRequestException("Template has already been removed");
+      if (content.status === false) {
+        throw new BadRequestException("Content has already been removed");
       }
-      template.status = false;
-      return await this.templateRepo.save(template);
+      content.status = false;
+      return await this.templateRepo.save(content);
     } catch (e) {
       throw e instanceof NotFoundException || e instanceof BadRequestException
         ? e

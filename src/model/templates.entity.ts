@@ -24,12 +24,6 @@ export class templateEntity extends parentEntity {
     @Column()
     promptTemplate: string;
 
-    @Column({ default: null })
-    content: string;
-
-    @Column({ default: false })
-    status: boolean;
-
     @OneToMany(() => contentEntity, (content) => content.template)
     contents: contentEntity[];
 

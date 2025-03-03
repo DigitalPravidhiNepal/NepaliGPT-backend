@@ -9,10 +9,11 @@ import { ttsEntity } from 'src/model/tts.entity';
 import { sttEntity } from 'src/model/stt.entity';
 import { imageEntity } from 'src/model/image.entity';
 import { codeEntity } from 'src/model/code.entity';
+import { contentEntity } from 'src/model/content.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([userEntity, templateEntity, ttsEntity, sttEntity, imageEntity, codeEntity])],
+  imports: [TypeOrmModule.forFeature([userEntity, contentEntity, ttsEntity, sttEntity, imageEntity, codeEntity])],
   controllers: [UserController],
   providers: [UserService, UploadService],
 })

@@ -8,6 +8,9 @@ export class contentEntity extends parentEntity {
     @Column()
     content: string;
 
+    @Column({ default: false })
+    status: boolean;
+
     @ManyToOne(() => userEntity, (user) => user.contents, { onDelete: 'CASCADE' })
     user: userEntity;
 

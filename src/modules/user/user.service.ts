@@ -12,14 +12,15 @@ import { templateEntity } from 'src/model/templates.entity';
 import { ttsEntity } from 'src/model/tts.entity';
 import { DocumentName } from 'src/helper/types/index.type';
 import { authEntity } from 'src/model/auth.entity';
+import { contentEntity } from 'src/model/content.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(userEntity)
     private readonly userRepository: Repository<userEntity>,
-    @InjectRepository(templateEntity)
-    private readonly templateRepo: Repository<templateEntity>,
+    @InjectRepository(contentEntity)
+    private readonly contentRepo: Repository<contentEntity>,
     @InjectRepository(imageEntity)
     private imageRepository: Repository<imageEntity>,
     @InjectRepository(codeEntity)
@@ -48,7 +49,7 @@ export class UserService {
     try {
       switch (documentName) {
         case DocumentName.Template:
-          return await this.templateRepo.find({ where: { status: true, user: { id } } });
+          return await this.contentRepo.find({ where: { status: true, user: { id } } });
         case DocumentName.Image:
           return await this.imageRepository.find({ where: { status: true, user: { id } } });
         case DocumentName.Code:

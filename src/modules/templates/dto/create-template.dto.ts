@@ -11,6 +11,14 @@ export class FieldDto {
     @IsString()
     @ApiProperty()
     type: string;
+
+    @IsString()
+    @ApiProperty()
+    label: string;
+
+    @IsString()
+    @ApiProperty()
+    placeholder: string;
 }
 
 export class CreateTemplateDto {
@@ -35,6 +43,7 @@ export class CreateTemplateDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => FieldDto)
+    @ApiProperty({ type: [FieldDto] })
     fields: FieldDto[];
 
     @IsString()

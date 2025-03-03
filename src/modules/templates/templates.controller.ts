@@ -53,19 +53,21 @@ export class TemplatesController {
     return this.templatesService.findOne(+id);
   }
 
-  // @Patch('save/:id')
-  // @Roles(roleType.customer)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
-  // update(@Req() req: any, @Param('id') id: string) {
-  //   const userId = req.user.sub;
-  //   return this.templatesService.updateStatus(id, userId);
-  // }
+  @Patch('save/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "save template content" })
+  update(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user.sub;
+    return this.templatesService.updateStatus(id, userId);
+  }
 
   @Patch('unsave/:id')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "unsave template content" })
   unsave(@Param('id') id: string) {
     return this.templatesService.unsave(id);
   }
