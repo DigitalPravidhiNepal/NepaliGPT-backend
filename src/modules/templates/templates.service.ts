@@ -164,11 +164,27 @@ export class TemplatesService {
   }
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} template`;
+  async findOne(id: string) {
+    try {
+      const template = await this.templateRepo.findOne({ where: { id } });
+      if (!template) {
+        throw new NotFoundException("template not found");
+      }
+      return template;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} template`;
+  async remove(id: string) {
+    try {
+      const template = await this.templateRepo.findOne({ where: { id } });
+      if (!template) {
+        throw new NotFoundException("template not found");
+      }
+      return await this.templateRepo.remove(template);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }

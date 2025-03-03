@@ -25,9 +25,9 @@ export class TemplatesController {
   }
 
   @Post()
-  // @Roles(roleType.superAdmin)
-  // @UseGuards(AtGuard, RolesGuard)
-  // @ApiBearerAuth('access-token')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'create template by superadmin' })
   create(@Body() createTemplateDto: CreateTemplateDto) {
     return this.templatesService.create(createTemplateDto);
@@ -44,13 +44,15 @@ export class TemplatesController {
   }
 
   @Get()
+  @ApiOperation({ summary: "get all templates" })
   findAll() {
     return this.templatesService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: "get a template" })
   findOne(@Param('id') id: string) {
-    return this.templatesService.findOne(+id);
+    return this.templatesService.findOne(id);
   }
 
   @Patch('save/:id')
@@ -73,7 +75,11 @@ export class TemplatesController {
   }
 
   @Delete(':id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "delete template" })
   remove(@Param('id') id: string) {
-    return this.templatesService.remove(+id);
+    return this.templatesService.remove(id);
   }
 }
