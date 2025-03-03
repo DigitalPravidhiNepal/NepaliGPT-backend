@@ -17,12 +17,17 @@ import { TemplatesModule } from './modules/templates/templates.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      ttl: 50 * 1000, // Cache expiration time
+    }),
     TypeOrmModule.forRoot(databaseConfig),
     AuthModule,
     UserModule,
