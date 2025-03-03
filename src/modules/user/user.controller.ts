@@ -10,7 +10,9 @@ import { ApiTags, ApiResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation
 import { PhotoUpdateDto } from './dto/update-photo.dto';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { FileInterceptor } from '@nestjs/platform-express'
+import { CacheInterceptor } from '@nestjs/cache-manager';
 @Controller('user')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('User')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })

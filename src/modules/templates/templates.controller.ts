@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
@@ -8,8 +8,10 @@ import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('templates')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Templates')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })

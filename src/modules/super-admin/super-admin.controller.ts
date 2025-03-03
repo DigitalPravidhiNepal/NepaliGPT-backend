@@ -13,8 +13,10 @@ import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
 import { PaginationDto } from 'src/helper/utils/pagination.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/helper/utils/files_upload';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('super-admin')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Super Admin')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })

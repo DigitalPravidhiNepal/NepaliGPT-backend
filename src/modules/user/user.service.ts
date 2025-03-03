@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +13,7 @@ import { ttsEntity } from 'src/model/tts.entity';
 import { DocumentName } from 'src/helper/types/index.type';
 import { authEntity } from 'src/model/auth.entity';
 import { contentEntity } from 'src/model/content.entity';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Injectable()
 export class UserService {

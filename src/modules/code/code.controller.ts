@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors } from '@nestjs/common';
 import { CodeService } from './code.service';
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
@@ -7,8 +7,10 @@ import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('code')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Code')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })
