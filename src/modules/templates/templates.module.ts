@@ -5,10 +5,12 @@ import OpenAI from 'openai';
 import { templateEntity } from 'src/model/templates.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { contentEntity } from 'src/model/content.entity';
+import { userTokenEntity } from 'src/model/userToken.entity';
+import { UsertokenService } from '../usertoken/usertoken.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity])],
+  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity, userTokenEntity])],
   controllers: [TemplatesController],
-  providers: [TemplatesService, OpenAI],
+  providers: [TemplatesService, OpenAI, UsertokenService],
 })
 export class TemplatesModule { }

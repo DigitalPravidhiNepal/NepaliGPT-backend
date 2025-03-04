@@ -65,7 +65,6 @@ export class UploadService {
               console.error('Cloudinary upload error:', error);
               reject(new Error(`Cloudinary upload error: ${error.message}`));
             } else {
-              console.log('Cloudinary upload result:', result);
               resolve(result.secure_url); // Return the URL of the uploaded file
             }
           }
@@ -87,7 +86,6 @@ export class UploadService {
               console.error('Cloudinary upload error:', error);
               reject(new Error(`Cloudinary upload error: ${error.message}`));
             } else {
-              console.log('Cloudinary upload result:', result);
               resolve(result.secure_url); // Return the URL of the uploaded image
             }
           }

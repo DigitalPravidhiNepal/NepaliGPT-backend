@@ -135,7 +135,6 @@ export enum PermissionType {
 
 export enum AccessType {
     FREE = 'Free',
-    STANDARD = 'Standard',
     PREMIUM = 'Premium'
 }
 
@@ -208,4 +207,6 @@ export enum Language {
     NORWEGIAN = "Norwegian",
     NEPALI = "Nepali"
 }
+
+
 

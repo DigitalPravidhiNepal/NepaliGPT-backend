@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { userEntity } from 'src/model/user.entity';
 import { TransformationType } from 'class-transformer';
 import { contentEntity } from 'src/model/content.entity';
+import { userTokenEntity } from 'src/model/userToken.entity';
+import { UsertokenService } from '../usertoken/usertoken.service';
 
 @Injectable()
 export class TemplatesService {
@@ -18,7 +20,10 @@ export class TemplatesService {
     private readonly templateRepo: Repository<templateEntity>,
     @InjectRepository(contentEntity)
     private readonly contentRepo: Repository<contentEntity>,
+    @InjectRepository(userTokenEntity)
+    private readonly userTokenRepository: Repository<userTokenEntity>,
     private configService: ConfigService,
+    private userTokenService: UsertokenService
 
   ) {
     this.openai = new OpenAI({
@@ -72,7 +77,13 @@ export class TemplatesService {
         High: 1.0,
       };
       const temperature = temperatureMapping[creativity] || 0.7; // Default: Medium
-
+      const token = await this.userTokenRepository.findOne({ where: { user: { id } } });
+      if (!token) {
+        throw new BadRequestException("Please buy token to use the service");
+      }
+      if (token.remainingTokens === 0) {
+        throw new BadRequestException("Token has been finished. Please buy token to use the service")
+      }
       // Call OpenAI API
       const response = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
@@ -80,19 +91,24 @@ export class TemplatesService {
         max_tokens: maxToken,
         temperature: temperature,
       });
+      if (response) {
+        // Extract and process generated content
+        const generatedContent = response.choices
+          .map(choice => choice.message?.content?.trim() ?? '') // Ensure content exists
+          .join("\n");
+        // Save generated content
+        const Content = new contentEntity();
+        Content.content = generatedContent;
+        Content.user = { id: userId } as userEntity;
+        Content.template = { id } as templateEntity;
+        await this.contentRepo.save(Content)
+        const remainingToken = await this.userTokenService.deductTokens(userId);
+        return {
+          status: true,
+          remainingToken: remainingToken
+        };
+      }
 
-      // Extract and process generated content
-      const generatedContent = response.choices
-        .map(choice => choice.message?.content?.trim() ?? '') // Ensure content exists
-        .join("\n");
-
-
-      // Save generated content
-      const Content = new contentEntity();
-      Content.content = generatedContent;
-      Content.user = { id: userId } as userEntity;
-      Content.template = { id } as templateEntity;
-      return await this.contentRepo.save(Content);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -107,6 +123,24 @@ export class TemplatesService {
     } catch (e) {
       throw new BadRequestException(e.message);
     }
+  }
+
+  //create template
+  async update(id: string, updateTemplateDto: UpdateTemplateDto) {
+    try {
+      const template = await this.templateRepo.findOne({ where: { id } });
+      if (!template) {
+        throw new NotFoundException("Template not found");
+      }
+      Object.assign(template, updateTemplateDto)
+      return {
+        message: "updated successfully",
+        template: await this.templateRepo.save(template)
+      }
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+
   }
 
   //update status as true for saving
@@ -150,12 +184,13 @@ export class TemplatesService {
   //get all templates
   async findAll() {
     try {
-      await this.templateRepo.find({
+      return await this.templateRepo.find({
         select: {
           id: true,
           title: true,
           description: true,
           category: true,
+          pricing: true
         }
       })
     } catch (e) {

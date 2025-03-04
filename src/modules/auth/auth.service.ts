@@ -16,7 +16,6 @@ import { JwtPayload, roleType, VerifyPayload } from 'src/helper/types/index.type
 import { sendMail } from 'src/config/mail.config';
 import { userEntity } from 'src/model/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {

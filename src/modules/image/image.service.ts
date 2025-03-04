@@ -7,13 +7,18 @@ import { imageEntity } from 'src/model/image.entity';
 import { userEntity } from 'src/model/user.entity';
 import { Images } from 'openai/resources';
 import { UploadService } from 'src/helper/utils/files_upload';
+import { userTokenEntity } from 'src/model/userToken.entity';
+import { UsertokenService } from '../usertoken/usertoken.service';
 @Injectable()
 export class ImageService {
   constructor(
     private openai: OpenAI,
     @InjectRepository(imageEntity)
     private imageRepository: Repository<imageEntity>,
-    private uploadService: UploadService
+    @InjectRepository(userTokenEntity)
+    private userTokenRepository: Repository<userTokenEntity>,
+    private uploadService: UploadService,
+    private usertokenService: UsertokenService
   ) {
     // Initialize OpenAI API client
     this.openai = new OpenAI({
@@ -23,7 +28,6 @@ export class ImageService {
   async generateImage(generateImageDto: GenerateImageDto, id?: string) {
 
     const { title, artStyle, lightingStyle, moodStyle, imageSize, negative_keywords } = generateImageDto;
-    console.log(generateImageDto);
 
     // Define valid sizes for DALL-E 2 and DALL-E 3
     const dallE2Sizes = ['256x256', '512x512'];
@@ -47,19 +51,26 @@ export class ImageService {
     if (lightingStyle) fullPrompt += `, with ${lightingStyle} lighting`;
     if (moodStyle) fullPrompt += `, evoking a ${moodStyle} mood`;
     if (negative_keywords) fullPrompt += `, avoiding: ${negative_keywords}`;
+    const token = await this.userTokenRepository.findOne({ where: { user: { id } } });
+    if (!token) {
+      throw new BadRequestException("Please buy token to use the service");
+    }
+    if (token.remainingTokens === 0) {
+      throw new BadRequestException("Token has been finished. Please buy token to use the service")
+    }
     try {
       const response = await this.openai.images.generate({
-
         model: model,
         prompt: fullPrompt,
         n: 1,
-        size: imageSize
+        size: imageSize,
       });
 
       // Get the URL of the generated image
       const imageUrl = response.data[0].url;
       const savedImage = await this.uploadService.upload(imageUrl);
       if (savedImage && id) {
+        const remainingToken = await this.usertokenService.deductTokens(id);
         const Images = new imageEntity();
         Images.image = savedImage;
         Images.prompt = title;
@@ -68,7 +79,8 @@ export class ImageService {
         return {
           id: savedImages.id,
           image: savedImages.image, // Return the image URL
-          success: true
+          success: true,
+          remainingToken: remainingToken
         };
 
       }

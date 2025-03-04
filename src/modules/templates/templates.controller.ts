@@ -57,6 +57,15 @@ export class TemplatesController {
     return this.templatesService.findOne(id);
   }
 
+  @Patch(':id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "update template" })
+  updateTemplate(@Body() bodydto: UpdateTemplateDto, @Param('id') id: string) {
+    return this.templatesService.update(id, bodydto);
+  }
+
   @Patch('save/:id')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)

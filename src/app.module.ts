@@ -16,6 +16,7 @@ import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.modu
 import { TemplatesModule } from './modules/templates/templates.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
+import { UsertokenModule } from './modules/usertoken/usertoken.module';
 
 
 @Module({
@@ -39,6 +40,7 @@ import { redisStore } from 'cache-manager-redis-store';
     SpeechToTextModule,
     TextToSpeechModule,
     TemplatesModule,
+    UsertokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,7 +7,7 @@ export class FieldDto {
 
     @IsEnum(inputType)
     @ApiProperty({ enum: inputType })
-    type: inputType;
+    inputType: inputType;
 
     @IsString()
     @ApiProperty()
