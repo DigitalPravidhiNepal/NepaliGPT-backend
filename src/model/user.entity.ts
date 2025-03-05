@@ -10,6 +10,7 @@ import { subscriptionEntity } from "./subscription.entity";
 import { templateEntity } from "./templates.entity";
 import { contentEntity } from "./content.entity";
 import { userTokenEntity } from "./userToken.entity";
+import { paymentEntity } from "./payment.entity";
 
 @Entity('user')
 export class userEntity extends parentEntity {
@@ -52,6 +53,9 @@ export class userEntity extends parentEntity {
 
     @OneToMany(() => contentEntity, (content) => content.user, { cascade: true })
     contents: contentEntity[];
+
+    @OneToMany(() => paymentEntity, (payment) => payment.user, { cascade: true })
+    payments: paymentEntity[];
 
     @OneToOne(() => userTokenEntity, (userTokens) => userTokens.user, { cascade: true })
     @JoinColumn()

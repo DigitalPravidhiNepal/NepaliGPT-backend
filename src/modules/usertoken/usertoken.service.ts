@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { userTokenEntity } from 'src/model/userToken.entity';
@@ -41,17 +41,32 @@ export class UsertokenService {
         };
     }
 
-
-    // Deduct tokens when user uses a service
-    async deductTokens(userId: string) {
+    // Deduct tokens when the user uses a service
+    async deductTokens(userId: string, usedToken: number) {
         const userTokens = await this.userTokensRepo.findOne({ where: { user: { id: userId } } });
 
-        if (!userTokens || userTokens.remainingTokens < userTokens.usedTokens) {
-            throw new Error("Insufficient tokens. Please recharge.");
+        // Check if userTokens exists and has enough remaining tokens
+        if (!userTokens) {
+            throw new BadRequestException("User not found.");
         }
-        userTokens.usedTokens++;
-        userTokens.remainingTokens = userTokens.totalTokens - userTokens.usedTokens;
+
+        if (userTokens.remainingTokens < usedToken) {
+            throw new BadRequestException("Insufficient tokens. Please recharge.");
+        }
+
+        // Update user's token usage
+        userTokens.usedTokens += usedToken;
+        userTokens.remainingTokens -= usedToken;
+
+        // If remaining tokens are 0, set totalTokens to 0 as well
+        if (userTokens.remainingTokens === 0) {
+            userTokens.totalTokens = 0;
+        }
+
+        // Save the updated user tokens to the database
         await this.userTokensRepo.save(userTokens);
+
+        // Return the remaining tokens
         return userTokens.remainingTokens;
     }
 

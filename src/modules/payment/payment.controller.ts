@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, HttpStatus, Req, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AtGuard } from 'src/middlewares/access_token/at.guard';
 
 @Controller('payment')
 @ApiTags('Payment')
@@ -12,29 +13,31 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 @ApiResponse({ status: 500, description: 'Server Error' })
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) { }
+  @Post('initiate')
+  @UseGuards(AtGuard)
+  @ApiBearerAuth('access-token')
+  // async initiatePayment(
+  //   @Body() createPaymentDto: CreatePaymentDto, @Req() req: any
+  // ) {
+  //   const userId = req.user.id;
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  //   try {
+  //     const paymentUrl = await this.paymentService.initiatePayment(createPaymentDto, userId,);
+  //     return {
+  //       status: HttpStatus.OK,
+  //       url: paymentUrl
+  //     }
+  //   } catch (error) {
+  //     throw new BadRequestException(error.message);
+  //   };
+  // }
+
+  @Patch('change-payment/:token')
+  @UseGuards(AtGuard)
+  @ApiBearerAuth('access-token')
+  changePayment(@Req() req: any, @Param('token') token: string) {
+    const userId = req.user.id;
+    return this.paymentService.changePayment(userId, token);
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentService.update(+id, updatePaymentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentService.remove(+id);
-  }
 }

@@ -25,11 +25,11 @@ export class GenerateImageDto {
     @Transform(({ value }) => value || '')
     moodStyle?: string;
 
-    @ApiProperty()
+    @ApiProperty({ enum: ['256x256', '512x512', '1024x1024', '1792x1024', '1024x1792'], default: '1024x1024' })
     @IsOptional()
     @IsIn(['256x256', '512x512', '1024x1024', '1792x1024', '1024x1792']) // Allowed image sizes
-    @Transform(({ value }) => value || '1024x1024') // Default to '1024x1024' if not provided
-    imageSize?: '256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792';
+    @Transform(({ value }) => value ?? '1024x1024') // Ensures undefined or null gets replaced
+    imageSize: '256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792' = '1024x1024';
 
     @ApiProperty()
     @IsOptional()

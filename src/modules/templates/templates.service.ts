@@ -77,7 +77,7 @@ export class TemplatesService {
         High: 1.0,
       };
       const temperature = temperatureMapping[creativity] || 0.7; // Default: Medium
-      const token = await this.userTokenRepository.findOne({ where: { user: { id } } });
+      const token = await this.userTokenRepository.findOne({ where: { user: { id: userId } } });
       if (!token) {
         throw new BadRequestException("Please buy token to use the service");
       }
@@ -102,9 +102,11 @@ export class TemplatesService {
         Content.user = { id: userId } as userEntity;
         Content.template = { id } as templateEntity;
         await this.contentRepo.save(Content)
-        const remainingToken = await this.userTokenService.deductTokens(userId);
+        const usedToken = response.usage.total_tokens;
+
+        const remainingToken = await this.userTokenService.deductTokens(userId, usedToken);
         return {
-          status: true,
+          content: Content.content,
           remainingToken: remainingToken
         };
       }

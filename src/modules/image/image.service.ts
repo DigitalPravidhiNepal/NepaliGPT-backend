@@ -9,6 +9,7 @@ import { Images } from 'openai/resources';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { UsertokenService } from '../usertoken/usertoken.service';
+import { CalculateUsedToken } from 'src/helper/utils/get-tokencost';
 @Injectable()
 export class ImageService {
   constructor(
@@ -18,7 +19,8 @@ export class ImageService {
     @InjectRepository(userTokenEntity)
     private userTokenRepository: Repository<userTokenEntity>,
     private uploadService: UploadService,
-    private usertokenService: UsertokenService
+    private usertokenService: UsertokenService,
+    private calculateUsedToken: CalculateUsedToken
   ) {
     // Initialize OpenAI API client
     this.openai = new OpenAI({
@@ -28,6 +30,7 @@ export class ImageService {
   async generateImage(generateImageDto: GenerateImageDto, id?: string) {
 
     const { title, artStyle, lightingStyle, moodStyle, imageSize, negative_keywords } = generateImageDto;
+    console.log(generateImageDto);
 
     // Define valid sizes for DALL-E 2 and DALL-E 3
     const dallE2Sizes = ['256x256', '512x512'];
@@ -70,7 +73,8 @@ export class ImageService {
       const imageUrl = response.data[0].url;
       const savedImage = await this.uploadService.upload(imageUrl);
       if (savedImage && id) {
-        const remainingToken = await this.usertokenService.deductTokens(id);
+        const usedToken = await this.calculateUsedToken.getTokenCost(imageSize, model);
+        const remainingToken = await this.usertokenService.deductTokens(id, usedToken);
         const Images = new imageEntity();
         Images.image = savedImage;
         Images.prompt = title;
