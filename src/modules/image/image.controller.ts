@@ -42,7 +42,7 @@ export class ImageController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all images' })
   findAll(@Req() req: any) {
-    const id = req.user.id;
+    const id = req.user.sub;
     return this.imageService.findAll(id);
   }
 

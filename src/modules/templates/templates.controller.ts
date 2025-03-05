@@ -11,7 +11,6 @@ import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('templates')
-@UseInterceptors(CacheInterceptor)
 @ApiTags('Templates')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })

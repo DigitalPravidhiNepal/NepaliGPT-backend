@@ -109,7 +109,7 @@ export class AuthService {
         const token = await this.token.generateVerifyToken({ email: email });
         console.log(token);
 
-        const frontURL = `${process.env.FRONT_URL}/verified?${token}`;
+        const frontURL = `${process.env.FRONT_URL}/verified/${token}`;
         try {
           sendMail(email, 'Email Verification', this.emailTemplate(frontURL));
         } catch (error) {
