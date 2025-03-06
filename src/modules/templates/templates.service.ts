@@ -47,7 +47,6 @@ export class TemplatesService {
     }
 
   }
-
   async generate(id: string, dto: generateDto, userId: string) {
     try {
       const { maxToken, creativity, language, userInputs } = dto;
@@ -68,8 +67,6 @@ export class TemplatesService {
       // Append language instruction
       finalPrompt += ` (Write in ${language} language.)`;
       console.log(finalPrompt);
-
-
       // Convert creativity to OpenAI temperature value
       const temperatureMapping: Record<string, number> = {
         Low: 0.2,
@@ -110,7 +107,6 @@ export class TemplatesService {
           remainingToken: remainingToken
         };
       }
-
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -192,7 +188,7 @@ export class TemplatesService {
           title: true,
           description: true,
           category: true,
-          pricing: true
+          pricing: true,
         }
       })
     } catch (e) {

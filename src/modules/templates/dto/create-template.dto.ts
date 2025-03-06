@@ -5,6 +5,10 @@ import { AccessType, category, Creativity, inputType, Language } from "src/helpe
 
 export class FieldDto {
 
+    @IsString()
+    @ApiProperty()
+    id: string;
+
     @IsEnum(inputType)
     @ApiProperty({ enum: inputType })
     inputType: inputType;
