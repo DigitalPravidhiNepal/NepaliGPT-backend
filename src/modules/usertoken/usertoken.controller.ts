@@ -19,6 +19,7 @@ export class UsertokenController {
   @ApiBearerAuth('access-token')
   addToken(@Req() req: any, @Body() CreateTokenDto: createTokenDto) {
     const id = req.user.sub;
-    return this.usertokenService.addTokens(id, CreateTokenDto)
+    const { amount } = CreateTokenDto;
+    return this.usertokenService.addTokens(id, amount)
   }
 }

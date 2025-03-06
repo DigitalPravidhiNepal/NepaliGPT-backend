@@ -6,7 +6,6 @@ import { PermissionType, roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
-import { packageEntity } from 'src/model/package.entity';
 import { UUID } from 'crypto';
 import { CreateBotDto, CreateSuperAdminDto, UpdateBotDto, UpdatePhotoDto } from './dto/create-super-admin.dto';
 import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
@@ -124,46 +123,5 @@ export class SuperAdminController {
   }
 
 
-  // Create a new package
-  @Post('create-package')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'create packakge' })
-  async createPackage(@Body() createPackageDto: CreatePackageDto) {
-    return this.superAdminService.createPackage(createPackageDto);
-  }
 
-  // Get all pacakges
-  @Get('get-packages')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'get all pacakges' })
-  async findAll(): Promise<packageEntity[]> {
-    return this.superAdminService.findAllPackage();
-  }
-
-  // Update pacakge
-  @Patch('update-packages/:id')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'update pacakge' })
-  async update(
-    @Param('id') id: string,
-    @Body() updatePackageDto: UpdatePackageDto,
-  ) {
-    return this.superAdminService.updatePackage(id, updatePackageDto);
-  }
-
-  // Delete pacakge
-  @Delete('delete-packages/:id')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'delete pacakge' })
-  async delete(@Param('id', ParseUUIDPipe) id: UUID): Promise<packageEntity> {
-    return this.superAdminService.deletePackage(id);
-  }
 } 

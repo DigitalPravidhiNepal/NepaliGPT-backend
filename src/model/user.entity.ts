@@ -6,11 +6,10 @@ import { codeEntity } from "./code.entity";
 import { chatEntity } from "./chat.entity";
 import { sttEntity } from "./stt.entity";
 import { ttsEntity } from "./tts.entity";
-import { subscriptionEntity } from "./subscription.entity";
-import { templateEntity } from "./templates.entity";
 import { contentEntity } from "./content.entity";
 import { userTokenEntity } from "./userToken.entity";
 import { paymentEntity } from "./payment.entity";
+
 
 @Entity('user')
 export class userEntity extends parentEntity {
@@ -47,9 +46,6 @@ export class userEntity extends parentEntity {
 
     @OneToMany(() => ttsEntity, (tts) => tts.user, { cascade: true })
     tts: ttsEntity[];
-
-    @OneToMany(() => subscriptionEntity, (subscription) => subscription.user, { cascade: true })
-    subscription: subscriptionEntity[];
 
     @OneToMany(() => contentEntity, (content) => content.user, { cascade: true })
     contents: contentEntity[];

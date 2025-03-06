@@ -7,7 +7,6 @@ import databaseConfig from './config/pg.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
-import { PaymentModule } from './modules/payment/payment.module';
 import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { CodeModule } from './modules/code/code.module';
@@ -17,6 +16,7 @@ import { TemplatesModule } from './modules/templates/templates.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 import { UsertokenModule } from './modules/usertoken/usertoken.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 
 @Module({
@@ -33,7 +33,6 @@ import { UsertokenModule } from './modules/usertoken/usertoken.module';
     AuthModule,
     UserModule,
     SuperAdminModule,
-    PaymentModule,
     ImageModule,
     ChatModule,
     CodeModule,
@@ -41,6 +40,7 @@ import { UsertokenModule } from './modules/usertoken/usertoken.module';
     TextToSpeechModule,
     TemplatesModule,
     UsertokenModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

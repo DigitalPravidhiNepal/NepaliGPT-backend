@@ -4,12 +4,12 @@ import { PaymentController } from './payment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { userEntity } from 'src/model/user.entity';
 import { paymentEntity } from 'src/model/payment.entity';
-import { JwtService } from '@nestjs/jwt';
 import { UsertokenService } from '../usertoken/usertoken.service';
+import { userTokenEntity } from 'src/model/userToken.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([userEntity, paymentEntity])],
+  imports: [TypeOrmModule.forFeature([userEntity, paymentEntity, userTokenEntity])],
   controllers: [PaymentController],
-  providers: [PaymentService, JwtService, UsertokenService],
+  providers: [PaymentService, UsertokenService],
 })
 export class PaymentModule { }

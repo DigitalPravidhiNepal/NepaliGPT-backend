@@ -7,7 +7,6 @@ import { authEntity } from 'src/model/auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantStatus, roleType } from 'src/helper/types/index.type';
 import { hash } from 'src/helper/utils/hash';
-import { packageEntity } from 'src/model/package.entity';
 import { UUID } from 'crypto';
 import { superAdminEntity } from 'src/model/superAdmin.entity';
 import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
@@ -19,9 +18,6 @@ export class SuperAdminService {
   constructor(
     @InjectRepository(authEntity)
     private readonly authRepository: Repository<authEntity>,
-
-    @InjectRepository(packageEntity)
-    private readonly packageRepository: Repository<packageEntity>,
     @InjectRepository(botEntity)
     private readonly botRepository: Repository<botEntity>,
     // @InjectRepository(superAdminEntity)
@@ -153,28 +149,5 @@ export class SuperAdminService {
   }
 
 
-  async createPackage(createPackageDto: CreatePackageDto): Promise<packageEntity> {
-    const newPackage = this.packageRepository.create(createPackageDto);
-    return await this.packageRepository.save(newPackage);
-  }
-
-  // async findAllPackageById(id: UUID): Promise<packageEntity> {
-  //   return await this.packageRepository.findOne({ where: { id: id } });
-  // }
-
-  async findAllPackage(): Promise<packageEntity[]> {
-    return await this.packageRepository.find();
-  }
-
-  async updatePackage(id: string, updatePackageDto: UpdatePackageDto): Promise<packageEntity> {
-    const existingPackage = await this.packageRepository.findOne({ where: { id } });
-    const updatedPackage = Object.assign(existingPackage, updatePackageDto);
-    return await this.packageRepository.save(updatedPackage);
-  }
-
-  async deletePackage(id: UUID): Promise<packageEntity> {
-    const existingPackage = await this.packageRepository.findOne({ where: { id } });
-    return await this.packageRepository.remove(existingPackage);
-  }
 
 }

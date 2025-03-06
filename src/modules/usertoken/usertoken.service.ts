@@ -12,8 +12,8 @@ export class UsertokenService {
         private userTokensRepo: Repository<userTokenEntity>,
         private readonly configService: ConfigService) { }
 
-    async addTokens(userId: string, CreateTokenDto: createTokenDto) {
-        const { amount } = CreateTokenDto;
+    async addTokens(userId: string, amount: number) {
+
         const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));  // Example: 1 USD = 132 NPR (Fetch dynamically)
         const totalCostPerMillionTokens = Number(this.configService.get<string>('TOTALTOKENCOST')); // API cost + 30% profit
 
@@ -30,7 +30,6 @@ export class UsertokenService {
             userTokens.remainingTokens = tokensToAdd;
         } else {
             userTokens.totalTokens += tokensToAdd;
-            userTokens.usedTokens = 0;
             userTokens.remainingTokens = userTokens.totalTokens - userTokens.usedTokens;
         }
 
