@@ -5,6 +5,11 @@ import { AccessType, category, inputType } from 'src/helper/types/index.type';
 
 export class UpdateFieldDto {
 
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional({ description: 'id for the field' })
+    id: string;
+
     @IsEnum(inputType)
     @IsOptional()
     @ApiPropertyOptional({ enum: inputType, description: 'Type of input field (text, number, etc.)' })

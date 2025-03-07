@@ -66,7 +66,10 @@ export class UsertokenService {
         await this.userTokensRepo.save(userTokens);
 
         // Return the remaining tokens
-        return userTokens.remainingTokens;
+        return {
+            remainingToken: userTokens.remainingTokens,
+            usedToken: userTokens.usedTokens
+        }
     }
 
     // Get remaining tokens for a user

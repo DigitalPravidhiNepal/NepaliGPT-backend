@@ -104,7 +104,8 @@ export class TemplatesService {
         const remainingToken = await this.userTokenService.deductTokens(userId, usedToken);
         return {
           content: Content.content,
-          remainingToken: remainingToken
+          tokenUsed: usedToken,
+          remainingToken: remainingToken.remainingToken
         };
       }
     } catch (e) {
@@ -203,7 +204,10 @@ export class TemplatesService {
       if (!template) {
         throw new NotFoundException("template not found");
       }
+      console.log(template);
+
       return template;
+
     } catch (e) {
       throw new BadRequestException(e.message);
     }

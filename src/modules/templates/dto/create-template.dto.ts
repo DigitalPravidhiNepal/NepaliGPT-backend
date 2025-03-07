@@ -51,8 +51,6 @@ export class CreateTemplateDto {
     @ApiProperty()
     promptTemplate: string;
 
-
-
 }
 export class generateDto {
 
