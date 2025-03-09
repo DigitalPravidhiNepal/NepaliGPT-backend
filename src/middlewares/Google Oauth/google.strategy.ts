@@ -3,6 +3,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { VerifyCallback } from "jsonwebtoken";
 import { Strategy } from "passport-google-oauth2";
+import { roleType } from "src/helper/types/index.type";
 import { authEntity } from "src/model/auth.entity";
 import { userEntity } from "src/model/user.entity";
 import { Repository } from "typeorm";
@@ -40,19 +41,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         }
 
         // If the user doesn't exist, create a new one
-        const newUser = this.userRepo.create({
-            name: displayName,
-            photo: photos[0]?.value || null,
-            isActive: true,
-        });
-        await this.userRepo.save(newUser);
-
         auth = this.authRepo.create({
             email,
             googleId: id,
-            user: newUser,
+            role: roleType.customer
         });
         await this.authRepo.save(auth);
+        const newUser = this.userRepo.create({
+            name: displayName,
+            photo: photos[0]?.value || null,
+            auth: auth
+        });
+        await this.userRepo.save(newUser);
+
 
         return done(null, auth);
     }
