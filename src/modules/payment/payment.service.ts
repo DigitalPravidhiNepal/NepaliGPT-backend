@@ -110,15 +110,15 @@ export class PaymentService {
 
             payment.payment = true;
             await this.paymentRepo.save(payment);
-            const amount = payment.amount
+            if (payment.payment === true) {
+                const amount = payment.amount
+                // Update credit balance
+                this.userTokenService.addTokens(userId, amount)
 
+                await this.userRepo.save(user);
 
-            // Update credit balance
-            this.userTokenService.addTokens(userId, amount)
-
-            await this.userRepo.save(user);
-
-            return { status: true };
+                return { status: true };
+            }
         } catch (e) {
             console.error("Payment update error:", e);
             throw new BadRequestException("Payment update failed. Please try again.");

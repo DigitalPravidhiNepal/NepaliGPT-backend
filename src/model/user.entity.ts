@@ -19,10 +19,10 @@ export class userEntity extends parentEntity {
     @Column({ nullable: true })
     photo: string;
 
-    @Column()
+    @Column({ nullable: true })
     phone: string;
 
-    @Column()
+    @Column({ nullable: true })
     country: string;
 
     @Column({ default: false })

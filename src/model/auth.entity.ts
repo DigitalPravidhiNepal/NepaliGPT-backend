@@ -8,8 +8,11 @@ export class authEntity extends parentEntity {
     @Column({ unique: true })
     email: string;
 
-    @Column()
+    @Column({ nullable: true })
     password: string;
+
+    @Column({ nullable: true, unique: true })
+    googleId: string; // Store Google ID for OAuth users
 
     @Column()
     role: roleType;

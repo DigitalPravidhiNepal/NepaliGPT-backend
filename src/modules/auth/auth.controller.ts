@@ -10,6 +10,7 @@ import { RtGuard } from 'src/middlewares/refresh_token/rt.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { UtGuard } from 'src/middlewares/utils_token/ut.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -48,6 +49,20 @@ export class AuthController {
     return this.authService.create(createuserdto, jwtPayload);
   }
 
+  @Get('google')
+  @ApiOperation({ summary: 'redirect to Google for authentication' })
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // This will redirect to Google for authentication
+  }
+
+  @Get('google/callback')
+  @ApiOperation({ summary: 'get user details from Google' })
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req) {
+    const auth = req.user;
+    return this.authService.GoogleOauth(auth);
+  }
   // @Post('staff-signin')
   // @ApiOperation({ summary: 'SignIn your Account' })
   // loginStaff(@Body() createAuthDto: CreateAuthDto) {

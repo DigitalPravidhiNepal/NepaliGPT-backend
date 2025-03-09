@@ -16,6 +16,7 @@ import { JwtPayload, roleType, VerifyPayload } from 'src/helper/types/index.type
 import { sendMail } from 'src/config/mail.config';
 import { userEntity } from 'src/model/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,8 +27,6 @@ export class AuthService {
     private hash: hash,
     private dataSource: DataSource
   ) { }
-
-
 
 
   async login(createAuthDto: CreateAuthDto) {
@@ -59,6 +58,28 @@ export class AuthService {
       await this.authRepository.save(authUser);
       return tokens;
     }
+  }
+  async GoogleOauth(auth: any) {
+    const { email } = auth;
+    const authUser = await this.authRepository.findOne({
+      where: { email },
+      relations: ['user']
+    });
+    const userId = authUser.user.id;
+    const tokens = {
+      accessToken: await this.token.generateAcessToken({
+        sub: userId,
+        role: authUser.role,
+      }),
+      refreshToken: await this.token.generateRefreshToken({
+        sub: userId,
+        role: authUser.role,
+      }),
+      role: authUser.role,
+    };
+    authUser.rToken = await this.hash.value(tokens.refreshToken);
+    await this.authRepository.save(authUser);
+    return tokens;
   }
 
   async loginAdmin(createAuthDto: CreateAuthDto) {

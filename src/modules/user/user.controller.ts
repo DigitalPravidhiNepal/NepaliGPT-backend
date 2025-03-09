@@ -11,6 +11,7 @@ import { PhotoUpdateDto } from './dto/update-photo.dto';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { FileInterceptor } from '@nestjs/platform-express'
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
 @Controller('user')
 @UseInterceptors(CacheInterceptor)
 @ApiTags('User')
@@ -55,13 +56,15 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Patch('edit-info/:id')
-  @Roles(roleType.superAdmin)
+
+  @Patch('add-info')
+  @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'edit user info by superAdmin' })
-  updateInfo(@Body() updateUserDto: UpdateUserDto, @Param('id') id: string) {
-    return this.userService.updateInfo(id, updateUserDto);
+  @ApiOperation({ summary: 'add phone and country after google oauth' })
+  addInfo(@Body() updateUserDto: UpdateAuthDto, @Req() req: any) {
+    const { id } = req.user;
+    return this.userService.addInfo(updateUserDto, id);
   }
 
   @Patch('edit-info')
@@ -99,6 +102,15 @@ export class UserController {
     const id = req.user.sub;
 
     return this.userService.updatePhoto(id, s3response);
+  }
+
+  @Patch('edit-info/:id')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'edit user info by superAdmin' })
+  updateInfo(@Body() updateUserDto: UpdateUserDto, @Param('id') id: string) {
+    return this.userService.updateInfo(id, updateUserDto);
   }
 
 

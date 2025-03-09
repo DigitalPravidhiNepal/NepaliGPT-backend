@@ -14,6 +14,7 @@ import { DocumentName } from 'src/helper/types/index.type';
 import { authEntity } from 'src/model/auth.entity';
 import { contentEntity } from 'src/model/content.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
 
 @Injectable()
 export class UserService {
@@ -34,6 +35,20 @@ export class UserService {
   ) { }
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
+  }
+
+  async addInfo(AddinfoDto: UpdateAuthDto, id: string) {
+    const { phone, country } = AddinfoDto;
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException("user not found");
+    }
+    user.phone = phone;
+    user.country = country;
+    await this.userRepository.save(user);
+    return {
+      status: true
+    }
   }
 
   async findAll() {
