@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsArray, IsEnum, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
-import { AccessType, category, Creativity, inputType, Language } from "src/helper/types/index.type";
+import { AccessType, category, ContentTone, Creativity, inputType, Language } from "src/helper/types/index.type";
 
 export class FieldDto {
 
@@ -69,6 +69,11 @@ export class generateDto {
     @IsEnum(Language)
     @ApiProperty({ enum: Language })
     language: Language;
+
+    @IsEnum(ContentTone)
+    @ApiProperty({ enum: ContentTone })
+    tone: ContentTone;
+
 
 }
 

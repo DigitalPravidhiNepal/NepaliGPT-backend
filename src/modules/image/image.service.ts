@@ -32,22 +32,22 @@ export class ImageService {
     const { title, artStyle, lightingStyle, moodStyle, imageSize, negative_keywords } = generateImageDto;
     console.log(generateImageDto);
 
-    // Define valid sizes for DALL-E 2 and DALL-E 3
-    const dallE2Sizes = ['256x256', '512x512'];
-    const dallE3Sizes = ['1024x1024', '1792x1024', '1024x1792'];
+    // // Define valid sizes for DALL-E 2 and DALL-E 3
+    // const dallE2Sizes = ['256x256', '512x512'];
+    // const dallE3Sizes = ['1024x1024', '1792x1024', '1024x1792'];
 
-    // Check if the image size is valid for either DALL-E 2 or DALL-E 3
-    if (![...dallE2Sizes, ...dallE3Sizes].includes(imageSize)) {
-      throw new BadRequestException('The size is not supported.');
-    }
+    // // Check if the image size is valid for either DALL-E 2 or DALL-E 3
+    // if (![...dallE2Sizes, ...dallE3Sizes].includes(imageSize)) {
+    //   throw new BadRequestException('The size is not supported.');
+    // }
 
     // Select model based on image size
-    let model = '';
-    if (dallE3Sizes.includes(imageSize)) {
-      model = 'dall-e-3'; // DALL-E 3 for larger sizes
-    } else if (dallE2Sizes.includes(imageSize)) {
-      model = 'dall-e-2'; // DALL-E 2 for smaller sizes
-    }
+    let model = 'dall-e-2';
+    // if (dallE3Sizes.includes(imageSize)) {
+    //   model = 'dall-e-3'; // DALL-E 3 for larger sizes
+    // } else if (dallE2Sizes.includes(imageSize)) {
+    //   model = 'dall-e-2'; // DALL-E 2 for smaller sizes
+    // }
 
     let fullPrompt = title;
     if (artStyle) fullPrompt += `, in the style of ${artStyle}`;

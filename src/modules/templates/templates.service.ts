@@ -49,7 +49,7 @@ export class TemplatesService {
   }
   async generate(id: string, dto: generateDto, userId: string) {
     try {
-      const { maxToken, creativity, language, userInputs } = dto;
+      const { maxToken, creativity, language, userInputs, tone } = dto;
 
       // Fetch the template
       const template = await this.templateRepo.findOne({ where: { id } });
@@ -65,7 +65,7 @@ export class TemplatesService {
       });
 
       // Append language instruction
-      finalPrompt += ` (Write in ${language} language.)`;
+      finalPrompt += ` (Write in ${language} language with ${tone} tone )`;
       console.log(finalPrompt);
       // Convert creativity to OpenAI temperature value
       const temperatureMapping: Record<string, number> = {

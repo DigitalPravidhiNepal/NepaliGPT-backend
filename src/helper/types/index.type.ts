@@ -208,5 +208,21 @@ export enum Language {
     NEPALI = "Nepali"
 }
 
+export enum ContentTone {
+    FORMAL = "formal",              // Professional and structured
+    INFORMAL = "informal",          // Friendly and conversational
+    FRIENDLY = "friendly",          // Warm and engaging
+    PROFESSIONAL = "professional",  // Business-like yet approachable
+    PERSUASIVE = "persuasive",      // Convincing and influential
+    INSPIRATIONAL = "inspirational", // Motivational and uplifting
+    AUTHORITATIVE = "authoritative", // Confident and expert-like
+    TECHNICAL = "technical",        // Precise and detailed
+    HUMOROUS = "humorous",          // Fun and witty
+    CASUAL = "casual",              // Relaxed and easygoing
+    SERIOUS = "serious",            // Grave and focused
+    NEUTRAL = "neutral",            // Balanced and objective
+    ENTHUSIASTIC = "enthusiastic",  // High-energy and passionate
+    EMPATHETIC = "empathetic",      // Understanding and compassionate
+}
 
 
