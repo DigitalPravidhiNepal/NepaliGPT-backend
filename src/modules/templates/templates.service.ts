@@ -197,7 +197,17 @@ export class TemplatesService {
     }
   }
 
+  async getPopular() {
+    return await this.templateRepo
+      .createQueryBuilder('t') // Alias "t" for Template table
+      .leftJoin('content', 'c', 't.id = c.templateId') // Join Content table where templateId matches
+      .select(['t.id', 't.title', 't.description', 'COUNT(c.id) AS usage_count']) // Select template ID, name, and count of usage
+      .groupBy('t.id') // Group results by template ID
+      .orderBy('usage_count', 'DESC') // Sort by most used templates
+      .limit(5) // Limit to top 5 results
+      .getRawMany(); // Return raw query result
 
+  }
   async findOne(id: string) {
     try {
       const template = await this.templateRepo.findOne({ where: { id } });

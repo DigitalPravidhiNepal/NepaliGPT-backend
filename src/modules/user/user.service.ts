@@ -84,12 +84,16 @@ export class UserService {
 
   async findOne(id: string) {
     try {
+      console.log(id);
+
       const user = await this.userRepository.findOne({
-        where: { id }, relations: ['auth'],
+        where: { id }, relations: ['auth', 'tokens'],
         select: {
           id: true,
           auth: { email: true },
-          name: true, phone: true, photo: true, country: true, isActive: true
+          name: true, phone: true, photo: true, country: true, isActive: true, tokens: {
+            remainingTokens: true, usedTokens: true, totalTokens: true
+          }
         }
       });
       return user;

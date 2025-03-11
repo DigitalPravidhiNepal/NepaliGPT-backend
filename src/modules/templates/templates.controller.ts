@@ -44,6 +44,12 @@ export class TemplatesController {
     return this.templatesService.generate(id, dto, userId);
   }
 
+  @Get('popular')
+  @ApiOperation({ summary: "get popular templates" })
+  findPopular() {
+    return this.templatesService.getPopular();
+  }
+
   @Get()
   @ApiOperation({ summary: "get all templates" })
   findAll() {
