@@ -8,11 +8,13 @@ import { UploadService } from 'src/helper/utils/files_upload';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { UsertokenService } from '../usertoken/usertoken.service';
 import { CalculateUsedToken } from 'src/helper/utils/get-tokencost';
+import { DownloadImage } from 'src/helper/utils/downloadImage';
+import { ResizeImage } from 'src/helper/utils/ResizeImage';
 
 @Module({
   imports: [TypeOrmModule.forFeature([imageEntity, userTokenEntity])],
   controllers: [ImageController],
-  providers: [ImageService, OpenAI, UploadService, UsertokenService, CalculateUsedToken],
+  providers: [ImageService, OpenAI, UploadService, UsertokenService, CalculateUsedToken, DownloadImage, ResizeImage],
   exports: [ImageService]
 })
 export class ImageModule { }

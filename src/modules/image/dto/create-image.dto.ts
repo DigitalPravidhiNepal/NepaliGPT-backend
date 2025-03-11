@@ -37,4 +37,5 @@ export class GenerateImageDto {
     @Transform(({ value }) => value || '')
     negative_keywords?: string;
 
+
 }
