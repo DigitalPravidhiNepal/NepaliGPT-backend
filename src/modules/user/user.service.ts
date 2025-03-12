@@ -84,8 +84,6 @@ export class UserService {
 
   async findOne(id: string) {
     try {
-      console.log(id);
-
       const user = await this.userRepository.findOne({
         where: { id }, relations: ['auth', 'tokens'],
         select: {
