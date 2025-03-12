@@ -33,76 +33,9 @@ export class SuperAdminController {
     return this.superAdminService.createSuperAdmin(createAuthDto);
   }
 
-  @Post('create-bot')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBasicAuth('access-token')
-  @ApiOperation({ summary: 'Create a bot' })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('photo'))
-  async createBot(@Body() createBotDto: CreateBotDto, @UploadedFile(
-    new ParseFilePipe({
-      fileIsRequired: false,
-      validators: [
-        // new MaxFileSizeValidator({ maxSize: 1000 }),
-        new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg|webp)/ }),
-      ],
-    }),
-  )
-  file?: Express.Multer.File) {
-
-    const s3response = createBotDto.photo ? createBotDto.photo : await this.uploadService.upload(file);
-    return this.superAdminService.createBot(createBotDto, s3response);
-  }
 
 
-  // Update pacakge
-  @Patch('update-botInfo/:id')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'update bot info' })
-  async updateBot(
-    @Param('id') id: string,
-    @Body() updateBotDTO: UpdateBotDto,
-  ) {
-    return this.superAdminService.updateBot(id, updateBotDTO);
-  }
 
-  // Update bot image
-  @Patch('update-photo/:id')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'update avatar of bot' })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('photo'))
-  async updateAvatar(
-    @Param('id') id: string,
-    @Body() updatePhotoDto: UpdatePhotoDto, @UploadedFile(
-      new ParseFilePipe({
-        fileIsRequired: false,
-        validators: [
-          // new MaxFileSizeValidator({ maxSize: 1000 }),
-          new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg|webp)/ }),
-        ],
-      }),
-    )
-    file?: Express.Multer.File) {
-    const s3response = updatePhotoDto.photo ? updatePhotoDto.photo : await this.uploadService.upload(file);
-    return this.superAdminService.updateAvatar(id, s3response);
-  }
-
-  //delete Bot
-
-  @Delete('delete-bot/:id')
-  @Roles(roleType.superAdmin)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'delete bot' })
-  deleteBot(@Param('id') id: string) {
-    return this.superAdminService.deleteBot(id);
-  }
   // // Delete Super Admin
   // @Delete('delete-super-admin/:id')
   // @Roles(roleType.superAdmin)

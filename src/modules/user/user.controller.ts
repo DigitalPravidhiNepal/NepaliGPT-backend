@@ -13,7 +13,6 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
 @Controller('user')
-@UseInterceptors(CacheInterceptor)
 @ApiTags('User')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })
@@ -31,6 +30,7 @@ export class UserController {
   }
 
   @Get('all')
+  @UseInterceptors(CacheInterceptor)
   @Roles(roleType.superAdmin)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
@@ -48,6 +48,7 @@ export class UserController {
   }
 
   @Get('get-info')
+  @UseInterceptors(CacheInterceptor)
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')

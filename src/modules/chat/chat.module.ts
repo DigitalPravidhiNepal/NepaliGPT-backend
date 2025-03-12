@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ChatController } from './chat.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { botEntity } from 'src/model/bot.entity';
 import { chatEntity } from 'src/model/chat.entity';
 import OpenAI from 'openai';
+import { sessionEntity } from 'src/model/session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([botEntity, chatEntity])],
+  imports: [TypeOrmModule.forFeature([chatEntity, sessionEntity])],
   controllers: [ChatController],
   providers: [ChatService, OpenAI],
 })

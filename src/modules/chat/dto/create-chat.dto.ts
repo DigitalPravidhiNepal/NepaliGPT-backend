@@ -1,13 +1,14 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsString } from "class-validator";
 
 export class CreateChatDto {
-
-    @ApiProperty()
-    @IsString()
-    botId: string;
-
     @ApiProperty()
     @IsString()
     prompt: string;
+}
+
+export class SessionId {
+    @ApiPropertyOptional()
+    @IsOptional()
+    sessionId: string;
 }

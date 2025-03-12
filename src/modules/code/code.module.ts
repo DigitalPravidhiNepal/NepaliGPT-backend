@@ -4,7 +4,7 @@ import { CodeController } from './code.controller';
 import { codeEntity } from 'src/model/code.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import OpenAI from 'openai';
-import { botEntity } from 'src/model/bot.entity';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([codeEntity])],

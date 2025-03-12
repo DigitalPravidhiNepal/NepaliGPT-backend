@@ -11,15 +11,12 @@ import { UUID } from 'crypto';
 import { superAdminEntity } from 'src/model/superAdmin.entity';
 import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
 import { PaginationDto } from 'src/helper/utils/pagination.dto';
-import { botEntity } from 'src/model/bot.entity';
 
 @Injectable()
 export class SuperAdminService {
   constructor(
     @InjectRepository(authEntity)
     private readonly authRepository: Repository<authEntity>,
-    @InjectRepository(botEntity)
-    private readonly botRepository: Repository<botEntity>,
     // @InjectRepository(superAdminEntity)
     // private readonly superAdminRepo: Repository<superAdminEntity>,
     private hash: hash,
@@ -54,55 +51,6 @@ export class SuperAdminService {
     }
   }
 
-  async createBot(createBotDto: CreateBotDto, photo: string) {
-    try {
-      const { role, name, instructions } = createBotDto;
-      const bot = new botEntity();
-      bot.name = name;
-      bot.role = role;
-      bot.instructions = instructions;
-      bot.photo = photo;
-      return await this.botRepository.save(bot)
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
-
-
-
-  async updateAvatar(id: string, photo: string) {
-    try {
-      const bot = await this.botRepository.findOne({ where: { id } });
-      bot.photo = photo;
-      await this.botRepository.save(bot);
-      return true
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-
-  }
-
-  async updateBot(id: string, updateBotDTO: UpdateBotDto) {
-    try {
-      const bot = await this.botRepository.findOne({ where: { id } });
-      const updatedBot = Object.assign(bot, updateBotDTO);
-      await this.botRepository.save(updatedBot);
-      return true;
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-
-  }
-
-  async deleteBot(id: string) {
-    try {
-      const bot = await this.botRepository.findOne({ where: { id } });
-      return await this.botRepository.remove(bot);
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-
-  }
   // async deleteSuperAdmin(id: UUID): Promise<authEntity> {
   //   const existingAdminAll = await this.authRepository.find();
   //   if (existingAdminAll.length === 1) {

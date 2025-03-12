@@ -13,7 +13,7 @@ export class ttsEntity extends parentEntity {
     @Column({ default: false })
     status: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.chat)
+    @ManyToOne(() => userEntity, (user) => user.tts)
     user: userEntity;
 
 }

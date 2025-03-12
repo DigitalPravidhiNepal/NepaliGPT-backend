@@ -9,6 +9,7 @@ import { ttsEntity } from "./tts.entity";
 import { contentEntity } from "./content.entity";
 import { userTokenEntity } from "./userToken.entity";
 import { paymentEntity } from "./payment.entity";
+import { sessionEntity } from "./session.entity";
 
 
 @Entity('user')
@@ -39,7 +40,7 @@ export class userEntity extends parentEntity {
     code: codeEntity[];
 
     @OneToMany(() => chatEntity, (chat) => chat.user, { cascade: true })
-    chat: chatEntity[];
+    chats: chatEntity[];
 
     @OneToMany(() => sttEntity, (stt) => stt.user, { cascade: true })
     stt: sttEntity[];
@@ -52,6 +53,10 @@ export class userEntity extends parentEntity {
 
     @OneToMany(() => paymentEntity, (payment) => payment.user, { cascade: true })
     payments: paymentEntity[];
+
+    @OneToMany(() => sessionEntity, (session) => session.user, { cascade: true })
+    sessions: sessionEntity[];
+
 
     @OneToOne(() => userTokenEntity, (userTokens) => userTokens.user, { cascade: true })
     @JoinColumn()

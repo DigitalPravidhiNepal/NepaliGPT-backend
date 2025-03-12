@@ -6,7 +6,7 @@ import OpenAI from 'openai';
 import { codeEntity } from 'src/model/code.entity';
 import { Repository } from 'typeorm';
 import { userEntity } from 'src/model/user.entity';
-import { botEntity } from 'src/model/bot.entity';
+
 
 @Injectable()
 export class CodeService {

@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { CreateChatDto } from './dto/create-chat.dto';
+import { CreateChatDto, SessionId } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { roleType } from 'src/helper/types/index.type';
@@ -24,50 +24,46 @@ export class ChatController {
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'generate chat' })
-  create(@Body() createChatDto: CreateChatDto, @Req() req: any) {
+  create(@Body() createChatDto: CreateChatDto, @Req() req: any, @Query() sessionId?: SessionId) {
     const { sub } = req.user;
-    return this.chatService.chat(createChatDto, sub);
+    return this.chatService.chat(createChatDto, sub, sessionId);
   }
 
-  @Get('get-chats/:id')
+
+  // Get chat sessions for a user
+  @Get('sessions/:userId')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'get chats' })
-  findAll(@Req() req: any, @Param('id') BotId: string) {
+  @ApiOperation({ summary: 'get all sessions' })
+  async getChatSessions(@Req() req: any) {
     const id = req.user.sub;
-    return this.chatService.findAll(id, BotId);
+    return this.chatService.getChatSessions(id);
   }
 
-
-  @Get('all-bots')
-  @Roles(roleType.superAdmin, roleType.customer)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all bots' })
-  findAllBots() {
-    return this.chatService.getBots();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chatService.findOne(+id);
-  }
-
-
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto) {
-    return this.chatService.update(+id, updateChatDto);
-  }
-
-  @Delete(':BotId')
+  // Get chats by session ID
+  @Get('session/:sessionId')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Delete chat with particular bot' })
-  remove(@Param('BotId') BotId: string, @Req() req: any) {
+  @ApiOperation({ summary: 'get chats by session id' })
+  async getChatsBySession(@Param('sessionId') sessionId: string, @Req() req: any) {
     const id = req.user.sub;
-    return this.chatService.remove(BotId, id);
+    return this.chatService.getChatHistory(sessionId, id);
   }
+
+  // Rename a chat session title
+  @Patch('session/:sessionId')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'rename the chat session title' })
+  async renameSession(
+    @Param('sessionId') sessionId: string,
+    @Body('title') title: string
+  ) {
+    return this.chatService.renameSessionTitle(sessionId, title);
+  }
+
+
 }
