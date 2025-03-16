@@ -22,7 +22,7 @@ export class ChatService {
     });
   }
 
-  async chat(createChatDto: CreateChatDto, id: string, sessionDto?: SessionId): Promise<string> {
+  async chat(createChatDto: CreateChatDto, id: string, sessionDto?: SessionId) {
     try {
       const { prompt } = createChatDto;
       const { sessionId } = sessionDto;
@@ -53,7 +53,10 @@ export class ChatService {
         chat.user = { id } as userEntity;
         await this.chatRepository.save(chat);
       }
-      return answer;
+      return {
+        response: answer,
+        sessionId: session.id
+      }
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -62,14 +65,15 @@ export class ChatService {
   async getChatSessions(userId: string): Promise<sessionEntity[]> {
     return await this.sessionRepository.find({
       where: { user: { id: userId } },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async getChatHistory(sessionId: string, userId: string): Promise<chatEntity[]> {
+  async getChatHistory(sessionId: string, userId: string) {
     return await this.chatRepository.find({
       where: { session: { id: sessionId }, user: { id: userId } },
       order: { createdAt: 'ASC' }, // Oldest messages first
+      select: { id: true, prompt: true, response: true, session: { id: true } }
     });
   }
 

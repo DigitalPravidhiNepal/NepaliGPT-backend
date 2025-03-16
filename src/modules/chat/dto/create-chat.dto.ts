@@ -12,3 +12,9 @@ export class SessionId {
     @IsOptional()
     sessionId: string;
 }
+
+export class updateTitle {
+    @IsString()
+    @ApiProperty()
+    title: string;
+}

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { CreateChatDto, SessionId } from './dto/create-chat.dto';
+import { CreateChatDto, SessionId, updateTitle } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { roleType } from 'src/helper/types/index.type';
@@ -31,7 +31,7 @@ export class ChatController {
 
 
   // Get chat sessions for a user
-  @Get('sessions/:userId')
+  @Get('sessions')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
@@ -60,8 +60,9 @@ export class ChatController {
   @ApiOperation({ summary: 'rename the chat session title' })
   async renameSession(
     @Param('sessionId') sessionId: string,
-    @Body('title') title: string
+    @Body() Updatetitle: updateTitle
   ) {
+    const { title } = Updatetitle;
     return this.chatService.renameSessionTitle(sessionId, title);
   }
 
