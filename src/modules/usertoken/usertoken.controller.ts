@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { UsertokenService } from './usertoken.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
@@ -22,4 +22,15 @@ export class UsertokenController {
     const { amount } = CreateTokenDto;
     return this.usertokenService.addTokens(id, amount)
   }
+
+  @Get('user-credit')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  getCredit(@Req() req: any) {
+    const id = req.user.sub;
+    return this.usertokenService.getUserTokens(id);
+  }
+
+
 }

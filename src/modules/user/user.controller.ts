@@ -57,6 +57,15 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Get('get-credit')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  getCredit(@Req() req: any) {
+    const id = req.user.sub;
+    return this.userService.getCredit(id);
+  }
+
 
   @Patch('add-info')
   @Roles(roleType.customer)

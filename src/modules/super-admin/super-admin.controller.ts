@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe, Query, FileTypeValidator, ParseFilePipe, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe, Query, FileTypeValidator, ParseFilePipe, UploadedFile, UseInterceptors, Put } from '@nestjs/common';
 import { SuperAdminService } from './super-admin.service';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import { ApiBasicAuth, ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -13,6 +13,8 @@ import { PaginationDto } from 'src/helper/utils/pagination.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { UpdatePriceDto } from '../usertoken/dto/create-token.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('super-admin')
 @UseInterceptors(CacheInterceptor)
@@ -23,7 +25,8 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 @ApiResponse({ status: 500, description: 'Server Error' })
 export class SuperAdminController {
   constructor(private readonly superAdminService: SuperAdminService,
-    private readonly uploadService: UploadService
+    private readonly uploadService: UploadService,
+    private configService: ConfigService
   ) { }
 
   // Add Super Admin
@@ -55,6 +58,27 @@ export class SuperAdminController {
     return this.superAdminService.findAllUser(paginationDto);
   }
 
+  @Get('get-prices')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'get-prices' })
+  getprices() {
+    return this.superAdminService.getPrice();
+  }
 
+  @Put('update-prices')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'update price' })
+  async updatePrices(@Body() updatePriceDto: UpdatePriceDto) {
+    const { exchangeRate, totalTokenCost } = updatePriceDto;
+
+    this.configService.set('EXCHANGE_RATE', exchangeRate.toString());
+    this.configService.set('TOTALTOKENCOST', totalTokenCost.toString());
+
+    return { message: 'Prices updated successfully' };
+  }
 
 } 

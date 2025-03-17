@@ -103,7 +103,7 @@ export class ChatService {
   }
 
   async deleteChat(id: string, sessionId: string) {
-    const session = await this.sessionRepository.findOne({ where: { id: sessionId } });
+    const session = await this.sessionRepository.findOne({ where: { id: sessionId, user: { id } } });
     if (!session) throw new NotFoundException('Session not found');
     const remove = await this.sessionRepository.remove(session);
     if (remove) {

@@ -85,7 +85,7 @@ export class ChatController {
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: "delete chat" })
-  remove(@Req() req: any, @Query('sessionId') sessionId: string) {
+  remove(@Req() req: any, @Param('sessionId') sessionId: string) {
     const id = req.user.sub;
     return this.chatService.deleteChat(id, sessionId)
   }

@@ -100,6 +100,16 @@ export class UserService {
     }
   }
 
+  async getCredit(id: string) {
+    const user = await this.userRepository.findOne({ where: { id }, relations: ['tokens'] });
+    if (!user) {
+      throw new NotFoundException("user not found");
+    }
+    return {
+      credit: user.tokens.remainingTokens
+    }
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.userRepository.findOne({ where: { id } });

@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { Repository } from 'typeorm';
 import { createTokenDto } from './dto/create-token.entity';
+import { Calculate } from 'src/helper/utils/getTotalCost';
+
 
 @Injectable()
 export class UsertokenService {
@@ -14,14 +16,9 @@ export class UsertokenService {
 
     async addTokens(userId: string, amount: number) {
 
-        const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));  // Example: 1 USD = 132 NPR (Fetch dynamically)
+        const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));
         const totalCostPerMillionTokens = Number(this.configService.get<string>('TOTALTOKENCOST')); // API cost + 30% profit
-
-        // Convert NPR to USD
-        const amountPaidUSD = amount / exchangeRate;
-
-        // Convert USD to tokens
-        const tokensToAdd = Math.floor((amountPaidUSD / totalCostPerMillionTokens) * 1_000_000);
+        const tokensToAdd = Calculate.calculateTokens(amount, exchangeRate, totalCostPerMillionTokens);
 
         let userTokens = await this.userTokensRepo.findOne({ where: { user: { id: userId } } });
 

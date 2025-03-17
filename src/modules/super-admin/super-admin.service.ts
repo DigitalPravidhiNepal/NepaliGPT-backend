@@ -11,6 +11,7 @@ import { UUID } from 'crypto';
 import { superAdminEntity } from 'src/model/superAdmin.entity';
 import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
 import { PaginationDto } from 'src/helper/utils/pagination.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SuperAdminService {
@@ -19,6 +20,7 @@ export class SuperAdminService {
     private readonly authRepository: Repository<authEntity>,
     // @InjectRepository(superAdminEntity)
     // private readonly superAdminRepo: Repository<superAdminEntity>,
+    private configService: ConfigService,
     private hash: hash,
     private dataSource: DataSource
   ) { }
@@ -96,6 +98,13 @@ export class SuperAdminService {
     }
   }
 
-
+  getPrice() {
+    const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));
+    const totalCostPerMillionTokens = Number(this.configService.get<string>('TOTALTOKENCOST'));
+    return {
+      exchangeRate: exchangeRate,
+      totalCostPerMillionTokens: totalCostPerMillionTokens
+    }
+  }
 
 }
