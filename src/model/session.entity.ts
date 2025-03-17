@@ -12,7 +12,7 @@ export class sessionEntity extends parentEntity {
     @ManyToOne(() => userEntity, (user) => user.sessions)
     user: userEntity;
 
-    @OneToMany(() => chatEntity, (chat) => chat.session)
+    @OneToMany(() => chatEntity, (chat) => chat.session, { cascade: ['remove'], onDelete: 'CASCADE' })
     chats: chatEntity[];
 
 

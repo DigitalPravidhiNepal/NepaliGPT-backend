@@ -18,3 +18,9 @@ export class updateTitle {
     @ApiProperty()
     title: string;
 }
+
+export class searchChat {
+    @IsString()
+    @ApiProperty()
+    query: string;
+}

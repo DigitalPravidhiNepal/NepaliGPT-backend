@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { CreateChatDto, SessionId, updateTitle } from './dto/create-chat.dto';
+import { CreateChatDto, searchChat, SessionId, updateTitle } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { roleType } from 'src/helper/types/index.type';
@@ -41,6 +41,17 @@ export class ChatController {
     return this.chatService.getChatSessions(id);
   }
 
+  //Search Chat by query
+  @Get('search-Chat')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'search chat' })
+  searchChat(@Req() req: any, @Query('query') query: string) {
+    const id = req.user.sub;
+    return this.chatService.searchChat(id, query)
+  }
+
   // Get chats by session ID
   @Get('session/:sessionId')
   @Roles(roleType.customer)
@@ -51,6 +62,8 @@ export class ChatController {
     const id = req.user.sub;
     return this.chatService.getChatHistory(sessionId, id);
   }
+
+
 
   // Rename a chat session title
   @Patch('session/:sessionId')
@@ -66,5 +79,14 @@ export class ChatController {
     return this.chatService.renameSessionTitle(sessionId, title);
   }
 
-
+  //delete Chat
+  @Delete('delete-chat/:sessionId')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "delete chat" })
+  remove(@Req() req: any, @Query('sessionId') sessionId: string) {
+    const id = req.user.sub;
+    return this.chatService.deleteChat(id, sessionId)
+  }
 }

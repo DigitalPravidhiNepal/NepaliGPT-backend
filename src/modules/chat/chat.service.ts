@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateChatDto, SessionId } from './dto/create-chat.dto';
+import { CreateChatDto, searchChat, SessionId } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import OpenAI from "openai"
 import { chatEntity } from 'src/model/chat.entity';
 import { userEntity } from 'src/model/user.entity';
@@ -77,6 +77,22 @@ export class ChatService {
     });
   }
 
+  async searchChat(id: string, query: string) {
+    return await this.chatRepository.find({
+      where: [
+        {
+          user: { id }, session: { title: ILike(`%${query}%`) }
+        },
+        {
+          user: { id }, response: ILike(`%${query}%`)
+        }
+      ], relations: ['session'],
+      select: { id: true, prompt: true, response: true, session: { id: true, title: true } },
+      order: { createdAt: 'DESC' }
+    })
+
+  }
+
 
   async renameSessionTitle(sessionId: string, newTitle: string): Promise<sessionEntity> {
     const session = await this.sessionRepository.findOne({ where: { id: sessionId } });
@@ -86,12 +102,17 @@ export class ChatService {
     return await this.sessionRepository.save(session);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
-
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
+  async deleteChat(id: string, sessionId: string) {
+    const session = await this.sessionRepository.findOne({ where: { id: sessionId } });
+    if (!session) throw new NotFoundException('Session not found');
+    const remove = await this.sessionRepository.remove(session);
+    if (remove) {
+      return {
+        status: true
+      }
+    } else {
+      throw new BadRequestException("Chat couldnot be deleted")
+    }
   }
 
 

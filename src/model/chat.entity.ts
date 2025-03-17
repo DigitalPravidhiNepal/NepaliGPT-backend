@@ -15,7 +15,7 @@ export class chatEntity extends parentEntity {
     @ManyToOne(() => userEntity, (user) => user.chats)
     user: userEntity;
 
-    @ManyToOne(() => sessionEntity, (session) => session.chats)
+    @ManyToOne(() => sessionEntity, (session) => session.chats, { onDelete: 'CASCADE' })
     session: sessionEntity;
 
 
