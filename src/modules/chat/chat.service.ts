@@ -81,7 +81,7 @@ export class ChatService {
     return await this.chatRepository.find({
       where: [
         {
-          user: { id }, session: { title: ILike(`%${query}%`) }
+          user: { id }, prompt: ILike(`%${query}%`)
         },
         {
           user: { id }, response: ILike(`%${query}%`)

@@ -7,6 +7,7 @@ import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 
 @Controller('chat')
@@ -42,6 +43,7 @@ export class ChatController {
   }
 
   //Search Chat by query
+  @SkipThrottle()
   @Get('search-chat')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
