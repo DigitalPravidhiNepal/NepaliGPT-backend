@@ -41,8 +41,7 @@ export class ChatService {
       const response = await this.openai.chat.completions.create({
         model: "gpt-4-turbo",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 400
+        temperature: 0.7
       });
       const answer = response.choices[0]?.message?.content || "No response from AI.";
       if (answer) {
