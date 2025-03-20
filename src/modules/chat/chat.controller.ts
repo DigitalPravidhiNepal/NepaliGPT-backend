@@ -42,7 +42,7 @@ export class ChatController {
   }
 
   //Search Chat by query
-  @Get('search-Chat')
+  @Get('search-chat')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')

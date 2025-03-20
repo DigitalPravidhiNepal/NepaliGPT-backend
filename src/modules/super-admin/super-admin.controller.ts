@@ -67,7 +67,7 @@ export class SuperAdminController {
     return this.superAdminService.getPrice();
   }
 
-  @Put('update-prices')
+  @Patch('update-prices')
   @Roles(roleType.superAdmin)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
@@ -75,8 +75,8 @@ export class SuperAdminController {
   async updatePrices(@Body() updatePriceDto: UpdatePriceDto) {
     const { exchangeRate, totalTokenCost } = updatePriceDto;
 
-    this.configService.set('EXCHANGE_RATE', exchangeRate.toString());
-    this.configService.set('TOTALTOKENCOST', totalTokenCost.toString());
+    this.configService.set('EXCHANGE_RATE', exchangeRate);
+    this.configService.set('TOTALTOKENCOST', totalTokenCost);
 
     return { message: 'Prices updated successfully' };
   }
