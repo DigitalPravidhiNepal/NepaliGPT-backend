@@ -24,3 +24,8 @@ export class searchChat {
     @ApiProperty()
     query: string;
 }
+export class PhotoUploadDto {
+    @IsString()
+    @ApiProperty()
+    photo: string;
+}

@@ -97,7 +97,7 @@ export class ImageService {
 
   async findAll(id: string) {
     try {
-      const images = await this.imageRepository.find({ where: { user: { id } }, select: { id: true, createdAt: true, image: true, prompt: true } });
+      const images = await this.imageRepository.find({ where: { user: { id } }, select: { id: true, createdAt: true, image: true, prompt: true, status: true } });
       return images;
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -115,14 +115,12 @@ export class ImageService {
   //update status as true for saving
   async updateStatus(id: string, userId: string) {
     try {
-      const image = await this.imageRepository.findOne({ where: { id } });
+      const image = await this.imageRepository.findOne({ where: { id, user: { id } } });
       if (!image) {
         throw new NotFoundException("Image not found");
       }
-      if (image.status === true) {
-        return new BadRequestException("Image have already been saved");
-      }
-      image.status = true;
+      const currentStatus = image.status;
+      image.status = !currentStatus;
       return await this.imageRepository.save(image);
     } catch (e) {
       throw e instanceof NotFoundException || e instanceof BadRequestException

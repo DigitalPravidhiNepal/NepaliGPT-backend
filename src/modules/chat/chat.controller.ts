@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, UseInterceptors, FileTypeValidator, ParseFilePipe, UploadedFile } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto, searchChat, SessionId, updateTitle } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
+import { PhotoUpdateDto } from '../user/dto/update-photo.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from 'src/helper/utils/files_upload';
 
 
 @Controller('chat')
@@ -29,6 +32,7 @@ export class ChatController {
     const { sub } = req.user;
     return this.chatService.chat(createChatDto, sub, sessionId);
   }
+
 
 
   // Get chat sessions for a user
