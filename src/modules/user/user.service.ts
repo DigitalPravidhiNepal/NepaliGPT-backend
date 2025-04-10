@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,19 +15,23 @@ import { authEntity } from 'src/model/auth.entity';
 import { contentEntity } from 'src/model/content.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
+import { UpdatePasswordDto } from './dto/update-photo.dto';
+import { hash } from 'src/helper/utils/hash';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(userEntity)
     private readonly userRepository: Repository<userEntity>,
+    @InjectRepository(authEntity)
+    private readonly authRepository: Repository<authEntity>,
+    private hash: hash,
     @InjectRepository(contentEntity)
     private readonly contentRepo: Repository<contentEntity>,
     @InjectRepository(imageEntity)
     private imageRepository: Repository<imageEntity>,
     @InjectRepository(codeEntity)
     private codeRepository: Repository<codeEntity>,
-
     @InjectRepository(sttEntity)
     private readonly sttRepository: Repository<sttEntity>,
     @InjectRepository(ttsEntity)
@@ -148,6 +152,27 @@ export class UserService {
 
   }
 
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const authUser = await this.authRepository.findOne({ where: { user: { id } }, relations: ['user'] });
+    if (!authUser) {
+      throw new NotFoundException("User not found");
+    }
+    const { oldPassword, newPassword } = updatePasswordDto;
+
+    const status = await this.hash.verifyHashing(authUser.password, oldPassword);
+    if (!status) {
+      throw new UnauthorizedException("Password doesn't match");
+    }
+    authUser.password = newPassword;
+    const updatedPassword = await this.authRepository.save(authUser);
+    if (updatedPassword) {
+      return {
+        message: "Password changed successfully",
+        status: true
+      }
+    }
+
+  }
 
   async remove(id: string) {
     try {

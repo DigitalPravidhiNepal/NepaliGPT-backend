@@ -10,11 +10,13 @@ import { sttEntity } from 'src/model/stt.entity';
 import { imageEntity } from 'src/model/image.entity';
 import { codeEntity } from 'src/model/code.entity';
 import { contentEntity } from 'src/model/content.entity';
+import { authEntity } from 'src/model/auth.entity';
+import { hash } from 'src/helper/utils/hash';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([userEntity, contentEntity, ttsEntity, sttEntity, imageEntity, codeEntity])],
+  imports: [TypeOrmModule.forFeature([userEntity, authEntity, contentEntity, ttsEntity, sttEntity, imageEntity, codeEntity])],
   controllers: [UserController],
-  providers: [UserService, UploadService],
+  providers: [UserService, UploadService, hash],
 })
 export class UserModule { }

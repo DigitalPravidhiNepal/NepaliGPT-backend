@@ -7,7 +7,7 @@ import { DocumentName, roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { PhotoUpdateDto } from './dto/update-photo.dto';
+import { PhotoUpdateDto, UpdatePasswordDto } from './dto/update-photo.dto';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { FileInterceptor } from '@nestjs/platform-express'
 import { CacheInterceptor } from '@nestjs/cache-manager';
@@ -87,6 +87,16 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
+  @Patch('changePassword')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'change password by user' })
+  updatePassword(@Body() updatePasswordDto: UpdatePasswordDto, @Req() req: any) {
+    const id = req.user.sub;
+    return this.userService.updatePassword(id, updatePasswordDto);
+  }
+
   @Patch('update-photo')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
@@ -124,9 +134,11 @@ export class UserController {
   }
 
 
+
+
   @Delete(':id')
   @Patch('update-photo')
-  @Roles(roleType.superAdmin)
+  @Roles(roleType.superAdmin, roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'delete user' })
