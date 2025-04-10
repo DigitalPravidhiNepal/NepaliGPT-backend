@@ -57,7 +57,6 @@ export class userEntity extends parentEntity {
     @OneToMany(() => sessionEntity, (session) => session.user, { cascade: true })
     sessions: sessionEntity[];
 
-
     @OneToOne(() => userTokenEntity, (userTokens) => userTokens.user, { cascade: true })
     @JoinColumn()
     tokens: userTokenEntity;

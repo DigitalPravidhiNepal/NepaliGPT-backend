@@ -19,17 +19,19 @@ export class CalculateUsedToken {
         //     "1024x1792": 320000  // Base cost
         // };
         const baseCostMap = {
-            "256x256": 2000,   // Base cost
-            "512x512": 5000,   // Base cost
-            "1024x1024": model === "dall-e-3" ? 120000 : 10000, // Base cost
-            "1792x1024": 15000, // Base cost
-            "1024x1792": 20000  // Base cost
+            "1024x1024": 0.08, // Base cost
+            "1024x1792": 0.12  // Base cost
         };
 
-        // Apply a 30% profit margin
-        // const profitMargin = 1.3;
+        // Apply a 20% profit margin
+        const profitMargin = 0.15;
+        const totalCostPerMillionTokens = Number(process.env.TOTALTOKENCOST);
+
+        const token = ((baseCostMap[imageSize] * profitMargin) / totalCostPerMillionTokens) * 1000000
+
+
         // return Math.ceil(baseCostMap[imageSize] * profitMargin);
-        return baseCostMap[imageSize];
+        return Math.floor(token);
     }
 }
 
