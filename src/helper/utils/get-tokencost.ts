@@ -1,5 +1,5 @@
 export class CalculateUsedToken {
-    getTokenCost(imageSize: string, model: string): number {
+    getTokenCost(imageSize: string): number {
         const baseCostMap = {
             "1024x1024": 0.08, // 1:1
             "1024x1792": 0.12, // Portrait

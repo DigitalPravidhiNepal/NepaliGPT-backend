@@ -20,7 +20,7 @@ export class sttEntity extends parentEntity {
     @Column({ default: false })
     status: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.stt)
+    @ManyToOne(() => userEntity, (user) => user.stt, { onDelete: 'CASCADE' })
     user: userEntity;
 
 }

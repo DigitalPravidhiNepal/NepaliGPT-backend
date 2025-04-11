@@ -23,6 +23,6 @@ export class authEntity extends parentEntity {
     @OneToOne(() => superAdminEntity, (sAdmin) => sAdmin.auth)
     superAdmin: superAdminEntity
 
-    @OneToOne(() => userEntity, (user) => user.auth)
+    @OneToOne(() => userEntity, (user) => user.auth, { onDelete: 'CASCADE' })
     user: userEntity
 }

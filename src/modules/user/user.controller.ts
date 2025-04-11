@@ -134,13 +134,8 @@ export class UserController {
   }
 
 
-
-
   @Delete(':id')
   @Patch('update-photo')
-  @Roles(roleType.superAdmin, roleType.customer)
-  @UseGuards(AtGuard, RolesGuard)
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'delete user' })
   remove(@Param('id') id: string) {
     return this.userService.remove(id);

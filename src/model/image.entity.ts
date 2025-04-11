@@ -14,7 +14,7 @@ export class imageEntity extends parentEntity {
     @Column({ default: false })
     status: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.image)
+    @ManyToOne(() => userEntity, (user) => user.image, { onDelete: 'CASCADE' })
     user: userEntity;
 
 }

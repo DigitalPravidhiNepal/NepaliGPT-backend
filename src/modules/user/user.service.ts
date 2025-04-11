@@ -163,7 +163,8 @@ export class UserService {
     if (!status) {
       throw new UnauthorizedException("Password doesn't match");
     }
-    authUser.password = newPassword;
+    const hashedPassword = await this.hash.value(newPassword);
+    authUser.password = hashedPassword;
     const updatedPassword = await this.authRepository.save(authUser);
     if (updatedPassword) {
       return {

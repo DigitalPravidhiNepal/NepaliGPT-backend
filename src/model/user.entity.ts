@@ -11,7 +11,6 @@ import { userTokenEntity } from "./userToken.entity";
 import { paymentEntity } from "./payment.entity";
 import { sessionEntity } from "./session.entity";
 
-
 @Entity('user')
 export class userEntity extends parentEntity {
     @Column()
@@ -29,35 +28,65 @@ export class userEntity extends parentEntity {
     @Column({ default: false })
     isActive: boolean;
 
-    @OneToOne(() => authEntity, (auth) => auth.user, { cascade: true })
+    @OneToOne(() => authEntity, (auth) => auth.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: 'authId' })
     auth: authEntity;
 
-    @OneToMany(() => imageEntity, (image) => image.user, { cascade: true })
+    @OneToMany(() => imageEntity, (image) => image.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     image: imageEntity[];
 
-    @OneToMany(() => codeEntity, (code) => code.user, { cascade: true })
+    @OneToMany(() => codeEntity, (code) => code.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     code: codeEntity[];
 
-    @OneToMany(() => chatEntity, (chat) => chat.user, { cascade: true })
+    @OneToMany(() => chatEntity, (chat) => chat.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     chats: chatEntity[];
 
-    @OneToMany(() => sttEntity, (stt) => stt.user, { cascade: true })
+    @OneToMany(() => sttEntity, (stt) => stt.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     stt: sttEntity[];
 
-    @OneToMany(() => ttsEntity, (tts) => tts.user, { cascade: true })
+    @OneToMany(() => ttsEntity, (tts) => tts.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     tts: ttsEntity[];
 
-    @OneToMany(() => contentEntity, (content) => content.user, { cascade: true })
+    @OneToMany(() => contentEntity, (content) => content.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     contents: contentEntity[];
 
-    @OneToMany(() => paymentEntity, (payment) => payment.user, { cascade: true })
+    @OneToMany(() => paymentEntity, (payment) => payment.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     payments: paymentEntity[];
 
-    @OneToMany(() => sessionEntity, (session) => session.user, { cascade: true })
+    @OneToMany(() => sessionEntity, (session) => session.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     sessions: sessionEntity[];
 
-    @OneToOne(() => userTokenEntity, (userTokens) => userTokens.user, { cascade: true })
+    @OneToOne(() => userTokenEntity, (userTokens) => userTokens.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     @JoinColumn()
     tokens: userTokenEntity;
 }

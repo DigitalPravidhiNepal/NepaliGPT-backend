@@ -14,7 +14,7 @@ export class userTokenEntity extends parentEntity {
     @Column({ type: "int", default: 0 })
     remainingTokens: number;
 
-    @OneToOne(() => userEntity, (user) => user.tokens)
+    @OneToOne(() => userEntity, (user) => user.tokens, { onDelete: 'CASCADE' })
     user: userEntity;
 
 }

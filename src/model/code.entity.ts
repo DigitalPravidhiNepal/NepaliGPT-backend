@@ -20,7 +20,7 @@ export class codeEntity extends parentEntity {
     @Column({ default: false })
     status: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.code)
+    @ManyToOne(() => userEntity, (user) => user.code, { onDelete: 'CASCADE' })
     user: userEntity;
 
 }

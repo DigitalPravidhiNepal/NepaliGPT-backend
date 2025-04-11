@@ -10,6 +10,6 @@ export class paymentEntity extends parentEntity {
     @Column({ default: false })
     payment: boolean;
 
-    @ManyToOne(() => userEntity, (user) => user.payments)
+    @ManyToOne(() => userEntity, (user) => user.payments, { onDelete: 'CASCADE' })
     user: userEntity;
 }

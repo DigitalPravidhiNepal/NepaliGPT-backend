@@ -12,7 +12,7 @@ export class chatEntity extends parentEntity {
     @Column()
     response: string;
 
-    @ManyToOne(() => userEntity, (user) => user.chats)
+    @ManyToOne(() => userEntity, (user) => user.chats, { onDelete: 'CASCADE' })
     user: userEntity;
 
     @ManyToOne(() => sessionEntity, (session) => session.chats, { onDelete: 'CASCADE' })
