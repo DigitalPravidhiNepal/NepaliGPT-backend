@@ -65,7 +65,7 @@ export class UsertokenService {
         // Return the remaining tokens
         return {
             remainingToken: userTokens.remainingTokens,
-            usedToken: userTokens.usedTokens
+            usedToken: usedToken
         }
     }
 

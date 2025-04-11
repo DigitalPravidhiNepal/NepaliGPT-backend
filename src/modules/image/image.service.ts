@@ -28,66 +28,88 @@ export class ImageService {
     });
   }
   async generateImage(generateImageDto: GenerateImageDto, id?: string) {
+    const {
+      title,
+      artStyle,
+      lightingStyle,
+      moodStyle,
+      imageSize,
+      negative_keywords,
+    } = generateImageDto;
 
-    const { title, artStyle, lightingStyle, moodStyle, imageSize, negative_keywords } = generateImageDto;
-    console.log(generateImageDto);
+    console.log('Generating image with:', generateImageDto);
 
-    // // Define valid sizes for DALL-E 3
     const dallE3Sizes = ['1024x1024', '1792x1024', '1024x1792'];
-
-    // // Check if the image size is valid for  DALL-E 3
-    if (![...dallE3Sizes].includes(imageSize)) {
+    if (!dallE3Sizes.includes(imageSize)) {
       throw new BadRequestException('The size is not supported.');
     }
 
-    // Select model based on image size
-    let model = 'dall-e-3';
+    // Optional: Basic prompt content filter
+    const forbiddenWords = ['nude', 'blood', 'violence', 'weapon', 'kill', 'dead'];
+    const fullPromptCandidate = `${title} ${artStyle ?? ''} ${lightingStyle ?? ''} ${moodStyle ?? ''} ${negative_keywords ?? ''}`.toLowerCase();
+    if (forbiddenWords.some(word => fullPromptCandidate.includes(word))) {
+      throw new BadRequestException('Your prompt contains restricted words. Please revise your request.');
+    }
 
+    // Build the prompt
     let fullPrompt = title;
     if (artStyle) fullPrompt += `, in the style of ${artStyle}`;
     if (lightingStyle) fullPrompt += `, with ${lightingStyle} lighting`;
     if (moodStyle) fullPrompt += `, evoking a ${moodStyle} mood`;
     if (negative_keywords) fullPrompt += `, avoiding: ${negative_keywords}`;
+    fullPrompt = fullPrompt.trim();
+
     const token = await this.userTokenRepository.findOne({ where: { user: { id } } });
     if (!token) {
-      throw new BadRequestException("Please buy token to use the service");
+      throw new BadRequestException('Please buy tokens to use this service.');
     }
     if (token.remainingTokens === 0) {
-      throw new BadRequestException("Token has been finished. Please buy token to use the service")
+      throw new BadRequestException('Your token balance is 0. Please recharge.');
     }
+
     try {
       const response = await this.openai.images.generate({
-        model: model,
+        model: 'dall-e-3',
         prompt: fullPrompt,
         n: 1,
         size: imageSize,
       });
 
-      // Get the URL of the generated image
       const imageUrl = response.data[0].url;
       const savedImage = await this.uploadService.upload(imageUrl);
+
       if (savedImage && id) {
         const usedToken = await this.calculateUsedToken.getTokenCost(imageSize);
-        const remainingToken = await this.usertokenService.deductTokens(id, usedToken);
-        const Images = new imageEntity();
-        Images.image = savedImage;
-        Images.prompt = title;
-        Images.user = { id } as userEntity;
-        const savedImages = await this.imageRepository.save(Images);
-        return {
-          id: savedImages.id,
-          image: savedImages.image, // Return the image URL
-          success: true,
-          remainingToken: remainingToken
-        };
+        console.log(usedToken);
 
+        const remainingToken = await this.usertokenService.deductTokens(id, usedToken);
+
+        const newImage = this.imageRepository.create({
+          image: savedImage,
+          prompt: title,
+          user: { id } as userEntity,
+        });
+
+        const saved = await this.imageRepository.save(newImage);
+
+        return {
+          id: saved.id,
+          image: saved.image,
+          success: true,
+          remainingToken,
+        };
       }
 
-
+      throw new BadRequestException('Image could not be saved.');
     } catch (error) {
-      throw new BadRequestException(error.message);
+      console.error('Image generation error:', error); // Log for internal debugging
+      if (error?.response?.status === 400) {
+        throw new BadRequestException('Your request was blocked by the safety system. Please revise your prompt.');
+      }
+      throw new BadRequestException('Image generation failed. Please try again later.');
     }
   }
+
 
   async findAll(id: string) {
     try {

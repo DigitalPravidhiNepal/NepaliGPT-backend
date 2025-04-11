@@ -9,8 +9,8 @@ export class CalculateUsedToken {
         const baseCost = baseCostMap[imageSize];
         if (!baseCost) return 0;
 
-        const profitMargin = Number(process.env.PROFIT_MARGIN) || 0.15;
-        const costPerMillionTokens = Number(process.env.TOTALTOKENCOST) || 1;
+        const profitMargin = 0.20;
+        const costPerMillionTokens = Number(process.env.TOTALTOKENCOST);
 
         const profitAddedCost = baseCost + (baseCost * profitMargin);
         const tokenCost = (profitAddedCost / costPerMillionTokens) * 1_000_000;
