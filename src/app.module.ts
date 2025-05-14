@@ -19,16 +19,20 @@ import { UsertokenModule } from './modules/usertoken/usertoken.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { authEntity } from './model/auth.entity';
+import { superAdminEntity } from './model/superAdmin.entity';
+import { SuperAdminSeederService } from './seed/seeder.service';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([authEntity, superAdminEntity]),
     ThrottlerModule.forRoot({
       throttlers: [
         {
           ttl: 60000,
           limit: 10,
-        }
-      ]
+        },
+      ],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -52,9 +56,13 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     PaymentModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard
-  }],
+  providers: [
+    SuperAdminSeederService,
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}
