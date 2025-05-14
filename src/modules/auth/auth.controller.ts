@@ -1,8 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, MailDto, passwordDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
@@ -19,20 +34,19 @@ import { AuthGuard } from '@nestjs/passport';
 @ApiResponse({ status: 400, description: 'Bad request' })
 @ApiResponse({ status: 500, description: 'Server Error' })
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signin')
   @ApiOperation({ summary: 'SignIn your user Account' })
   login(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.login(createAuthDto)
+    return this.authService.login(createAuthDto);
   }
 
   @Post('signin-superAdmin')
   @ApiOperation({ summary: 'SignIn your superAdmin Account' })
   loginSuperAdmin(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.loginAdmin(createAuthDto)
+    return this.authService.loginAdmin(createAuthDto);
   }
-
 
   //get email for verification
   @Post('get-verify')
@@ -71,10 +85,10 @@ export class AuthController {
 
   @Post('refresh-token')
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: "Generate access token" })
+  @ApiOperation({ summary: 'Generate access token' })
   @UseGuards(RtGuard)
   async refrshToken(@Req() req) {
-    const { user } = req
+    const { user } = req;
     return this.authService.refreshTokenAdmin(user);
   }
 

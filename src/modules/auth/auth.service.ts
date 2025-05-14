@@ -12,7 +12,11 @@ import { DataSource, Repository } from 'typeorm';
 import { Token } from 'src/helper/utils/token';
 import { hash } from 'src/helper/utils/hash';
 import { authEntity } from 'src/model/auth.entity';
-import { JwtPayload, roleType, VerifyPayload } from 'src/helper/types/index.type';
+import {
+  JwtPayload,
+  roleType,
+  VerifyPayload,
+} from 'src/helper/types/index.type';
 import { sendMail } from 'src/config/mail.config';
 import { userEntity } from 'src/model/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -25,18 +29,17 @@ export class AuthService {
     private readonly authRepository: Repository<authEntity>,
     private token: Token,
     private hash: hash,
-    private dataSource: DataSource
-  ) { }
-
+    private dataSource: DataSource,
+  ) {}
 
   async login(createAuthDto: CreateAuthDto) {
     const { email, password } = createAuthDto;
     const authUser = await this.authRepository.findOne({
       where: { email },
-      relations: ['user']
+      relations: ['user'],
     });
     if (!authUser || authUser.role === roleType.superAdmin) {
-      throw new ForbiddenException("User Not found")
+      throw new ForbiddenException('User Not found');
     } else {
       const status = await this.hash.verifyHashing(authUser.password, password);
       if (!status) {
@@ -63,7 +66,7 @@ export class AuthService {
     const { email } = auth;
     const authUser = await this.authRepository.findOne({
       where: { email },
-      relations: ['user']
+      relations: ['user'],
     });
     const userId = authUser.user.id;
     const tokens = {
@@ -82,15 +85,14 @@ export class AuthService {
     return tokens;
   }
 
-
   async loginAdmin(createAuthDto: CreateAuthDto) {
     const { email, password } = createAuthDto;
     const authUser = await this.authRepository.findOne({
       where: { email },
-      relations: ['superAdmin']
+      relations: ['superAdmin'],
     });
     if (!authUser || authUser.role === roleType.customer) {
-      throw new ForbiddenException("User Not found")
+      throw new ForbiddenException('User Not found');
     } else {
       const status = await this.hash.verifyHashing(authUser.password, password);
       if (!status) {
@@ -114,19 +116,16 @@ export class AuthService {
     }
   }
 
-
   //verify email
   async getVerify(mail: MailDto) {
     try {
       const { email } = mail;
-      const existingUser = await this.authRepository.findOne(
-        {
-          where: { email }
-        });
-
+      const existingUser = await this.authRepository.findOne({
+        where: { email },
+      });
 
       if (existingUser) {
-        throw new ForbiddenException("User already exists.");
+        throw new ForbiddenException('User already exists.');
       } else {
         const token = await this.token.generateVerifyToken({ email: email });
         console.log(token);
@@ -140,7 +139,6 @@ export class AuthService {
         return true;
       }
     } catch (e) {
-
       throw new BadRequestException(e.message);
     }
   }
@@ -161,7 +159,7 @@ export class AuthService {
       const user = new userEntity();
       user.name = name;
       user.phone = phone;
-      user.country = country
+      user.country = country;
       user.auth = auth;
       await queryRunner.manager.save(user);
       await queryRunner.commitTransaction();
@@ -177,7 +175,8 @@ export class AuthService {
 
   async forgetPasswordAdmin(body: MailDto): Promise<boolean> {
     const existingUser = await this.authRepository.findOne({
-      where: { email: body.email }, relations: ['user', 'superAdmin']
+      where: { email: body.email },
+      relations: ['user', 'superAdmin'],
     });
     if (!existingUser) {
       throw new NotFoundException("Email doesn't exist.");
@@ -194,8 +193,6 @@ export class AuthService {
     }
     return true;
   }
-
-
 
   // async getCombinedUserInfo(user: JwtPayload) {
   //   const userEntity = this.roleUser[user.role];
@@ -221,11 +218,12 @@ export class AuthService {
   //   }
   // }
 
-
   async refreshTokenAdmin(user: JwtPayload) {
-    return await this.token.generateAcessToken({ sub: user.sub, role: user.role })
+    return await this.token.generateAcessToken({
+      sub: user.sub,
+      role: user.role,
+    });
   }
-
 
   async resetPassword(id: string, passwordDto: passwordDto) {
     try {
@@ -237,11 +235,7 @@ export class AuthService {
       }
       user.password = hash;
       return await this.authRepository.save(user);
-    } catch (e) {
-
-    }
-
-
+    } catch (e) {}
   }
 
   passwordTemplate(resetUrl: any) {
