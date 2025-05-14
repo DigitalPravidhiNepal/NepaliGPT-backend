@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './exceptions/global.exception';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { getRepository } from 'typeorm';
+// import { getRepository } from 'typeorm';
 // import { staffPermissionEntity } from './model/staffPermission.entity';
 
 async function bootstrap() {
