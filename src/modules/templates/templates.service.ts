@@ -56,7 +56,7 @@ export class TemplatesService {
       if (!template) {
         throw new NotFoundException('Template not found');
       }
-
+      
       // Replace placeholders with user-provided values
       let finalPrompt = template.promptTemplate;
       Object.keys(userInputs).forEach((key) => {
@@ -73,7 +73,7 @@ export class TemplatesService {
         Medium: 0.7,
         High: 1.0,
       };
-      const temperature = temperatureMapping[creativity] || 0.7; // Default: Medium
+      const temperature = temperatureMapping[creativity] || 0.7; 
       const token = await this.userTokenRepository.findOne({ where: { user: { id: userId } } });
       if (!token) {
         throw new BadRequestException("Please buy token to use the service");
@@ -88,6 +88,8 @@ export class TemplatesService {
         max_tokens: maxToken,
         temperature: temperature,
       });
+      console.log(response)
+      return
       if (response) {
         // Extract and process generated content
         const generatedContent = response.choices

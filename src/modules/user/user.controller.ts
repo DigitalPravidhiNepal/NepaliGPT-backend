@@ -57,6 +57,15 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Get('get-info-by-id/:id')
+  @UseInterceptors(CacheInterceptor)
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  findOneById(@Param('id') id: string) {
+    return this.userService.findOne(id);
+  }
+
   @Get('get-credit')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
