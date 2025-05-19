@@ -40,6 +40,24 @@ export class UpdateUserDto {
     @IsString()
     @ApiProperty()
     country: string;
+}
+
+
+export class UpdateUserByAdminDto {
+    @IsOptional()
+    @IsString()
+    @ApiProperty()
+    name: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty()
+    phone: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty()
+    country: string;
 
     @IsOptional()
     @ApiProperty({ default: false })

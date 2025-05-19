@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, FileTypeValidator, ParseFilePipe, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UpdateUserByAdminDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { DocumentName, roleType } from 'src/helper/types/index.type';
@@ -93,6 +93,15 @@ export class UserController {
   @ApiOperation({ summary: 'edit user info by user' })
   update(@Body() updateUserDto: UpdateUserDto, @Req() req: any) {
     const { id } = req.user;
+    return this.userService.update(id, updateUserDto);
+  }
+
+  @Patch('edit-info-by-superadmin/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'edit user info by superadmin' })
+  updateBySuperAdmin(@Body() updateUserDto: UpdateUserByAdminDto, @Param('id') id: string) {
     return this.userService.update(id, updateUserDto);
   }
 
