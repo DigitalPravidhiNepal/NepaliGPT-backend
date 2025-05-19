@@ -97,7 +97,7 @@ export class UserController {
   }
 
   @Patch('edit-info-by-superadmin/:id')
-  @Roles(roleType.customer)
+  @Roles(roleType.superAdmin)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'edit user info by superadmin' })
