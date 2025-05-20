@@ -73,12 +73,18 @@ export class SuperAdminController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'update price' })
   async updatePrices(@Body() updatePriceDto: UpdatePriceDto) {
+
     const { exchangeRate, totalTokenCost } = updatePriceDto;
+    await this.configService.set('EXCHANGE_RATE', exchangeRate);
+    await this.configService.set('TOTALTOKENCOST', totalTokenCost);
 
-    this.configService.set('EXCHANGE_RATE', exchangeRate);
-    this.configService.set('TOTALTOKENCOST', totalTokenCost);
-
-    return { message: 'Prices updated successfully' };
+    return {
+      message: 'Prices updated successfully',
+      data: {
+        exchangeRate: this.configService.get('EXCHANGE_RATE'),
+        totalTokenCost: this.configService.get('TOTALTOKENCOST')
+      }
+    };
   }
 
 } 
