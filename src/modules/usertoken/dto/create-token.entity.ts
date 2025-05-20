@@ -10,7 +10,6 @@ export class createTokenDto {
 export class UpdatePriceDto {
 
     @IsString() // Needed because IsDecimal expects a string input
-    @IsDecimal()
     @ApiPropertyOptional()
     @IsOptional()
     exchangeRate: string;  // Example: "132.50" for 1 USD = 132.50 NPR
