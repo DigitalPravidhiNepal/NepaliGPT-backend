@@ -15,6 +15,9 @@ import { UploadService } from 'src/helper/utils/files_upload';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdatePriceDto } from '../usertoken/dto/create-token.entity';
 import { ConfigService } from '@nestjs/config';
+import { Repository } from 'typeorm';
+import { PricingEntity } from 'src/model/pricing.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('super-admin')
 @UseInterceptors(CacheInterceptor)
@@ -26,6 +29,10 @@ import { ConfigService } from '@nestjs/config';
 export class SuperAdminController {
   constructor(private readonly superAdminService: SuperAdminService,
     private readonly uploadService: UploadService,
+
+    @InjectRepository(PricingEntity)
+    private pricingRepository: Repository<PricingEntity>,
+
     private configService: ConfigService
   ) { }
 
@@ -73,18 +80,36 @@ export class SuperAdminController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'update price' })
   async updatePrices(@Body() updatePriceDto: UpdatePriceDto) {
-
     const { exchangeRate, totalTokenCost } = updatePriceDto;
-    await this.configService.set('EXCHANGE_RATE', exchangeRate);
-    await this.configService.set('TOTALTOKENCOST', totalTokenCost);
+    const isPricingSet = await this.pricingRepository.find();
+    if (isPricingSet.length === 0) {
+      const resp = await this.pricingRepository.save({ exchangeRate, totalTokenCost });
+      return {
+        message: 'Prices updated successfully',
+        data: resp
+      };
+    } else {
+      const pricing = isPricingSet[0];
+      pricing.exchangeRate = exchangeRate;
+      pricing.totalTokenCost = totalTokenCost;
+      const resp = await this.pricingRepository.save(pricing);
+      return {
+        message: 'Prices updated successfully',
+        data: resp
+      };
+    }
 
-    return {
-      message: 'Prices updated successfully',
-      data: {
-        exchangeRate: this.configService.get('EXCHANGE_RATE'),
-        totalTokenCost: this.configService.get('TOTALTOKENCOST')
-      }
-    };
+    // const { exchangeRate, totalTokenCost } = updatePriceDto;
+    // await this.configService.set('EXCHANGE_RATE', exchangeRate);
+    // await this.configService.set('TOTALTOKENCOST', totalTokenCost);
+
+    // return {
+    //   message: 'Prices updated successfully',
+    //   data: {
+    //     exchangeRate: this.configService.get('EXCHANGE_RATE'),
+    //     totalTokenCost: this.configService.get('TOTALTOKENCOST')
+    //   }
+    // };
   }
 
 } 

@@ -7,9 +7,10 @@ import { hash } from 'src/helper/utils/hash';
 
 import { UploadService } from 'src/helper/utils/files_upload';
 import { ConvertAudio } from 'src/helper/utils/conversion';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([authEntity])],
+  imports: [TypeOrmModule.forFeature([authEntity, PricingEntity])],
   controllers: [SuperAdminController],
   providers: [SuperAdminService, hash, UploadService],
 })

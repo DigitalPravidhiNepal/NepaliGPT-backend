@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { ConfigService } from '@nestjs/config';
 import { Calculate } from 'src/helper/utils/getTotalCost';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([userTokenEntity])],
+  imports: [TypeOrmModule.forFeature([userTokenEntity, PricingEntity])],
   controllers: [UsertokenController],
   providers: [UsertokenService, ConfigService]
 })

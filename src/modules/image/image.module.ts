@@ -10,9 +10,10 @@ import { UsertokenService } from '../usertoken/usertoken.service';
 import { CalculateUsedToken } from 'src/helper/utils/get-tokencost';
 import { DownloadImage } from 'src/helper/utils/downloadImage';
 import { ResizeImage } from 'src/helper/utils/ResizeImage';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([imageEntity, userTokenEntity])],
+  imports: [TypeOrmModule.forFeature([imageEntity, userTokenEntity, PricingEntity])],
   controllers: [ImageController],
   providers: [ImageService, OpenAI, UploadService, UsertokenService, CalculateUsedToken, DownloadImage, ResizeImage],
   exports: [ImageService]

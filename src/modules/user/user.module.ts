@@ -12,10 +12,11 @@ import { codeEntity } from 'src/model/code.entity';
 import { contentEntity } from 'src/model/content.entity';
 import { authEntity } from 'src/model/auth.entity';
 import { hash } from 'src/helper/utils/hash';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([userEntity, authEntity, contentEntity, ttsEntity, sttEntity, imageEntity, codeEntity])],
+  imports: [TypeOrmModule.forFeature([userEntity, authEntity, contentEntity, ttsEntity, sttEntity, imageEntity, codeEntity, PricingEntity])],
   controllers: [UserController],
   providers: [UserService, UploadService, hash],
 })

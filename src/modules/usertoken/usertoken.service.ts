@@ -5,19 +5,27 @@ import { userTokenEntity } from 'src/model/userToken.entity';
 import { Repository } from 'typeorm';
 import { createTokenDto } from './dto/create-token.entity';
 import { Calculate } from 'src/helper/utils/getTotalCost';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 
 @Injectable()
 export class UsertokenService {
     constructor(
+        @InjectRepository(PricingEntity)
+        private pricingRepository: Repository<PricingEntity>,
+
         @InjectRepository(userTokenEntity)
         private userTokensRepo: Repository<userTokenEntity>,
-        private readonly configService: ConfigService) { }
+        private readonly configService: ConfigService
+    ) { }
 
     async addTokens(userId: string, amount: number) {
+        const pricing = await this.pricingRepository.find();
+        const exchangeRate = +pricing[0].exchangeRate
+        const totalCostPerMillionTokens = +pricing[0].totalTokenCost;
 
-        const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));
-        const totalCostPerMillionTokens = Number(this.configService.get<string>('TOTALTOKENCOST')); // API cost + 30% profit
+        // const exchangeRate = Number(this.configService.get<string>('EXCHANGE_RATE'));
+        // const totalCostPerMillionTokens = Number(this.configService.get<string>('TOTALTOKENCOST')); // API cost + 30% profit
         const tokensToAdd = Calculate.calculateTokens(amount, exchangeRate, totalCostPerMillionTokens);
 
         let userTokens = await this.userTokensRepo.findOne({ where: { user: { id: userId } } });

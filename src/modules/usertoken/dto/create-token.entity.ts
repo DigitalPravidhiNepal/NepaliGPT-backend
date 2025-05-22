@@ -8,7 +8,6 @@ export class createTokenDto {
 }
 
 export class UpdatePriceDto {
-
     @IsString() // Needed because IsDecimal expects a string input
     @ApiPropertyOptional()
     @IsOptional()
@@ -19,6 +18,4 @@ export class UpdatePriceDto {
     @ApiPropertyOptional()
     @IsOptional()
     totalTokenCost: string;  // Example: "0.0005" for per 1M tokens
-
-
 }

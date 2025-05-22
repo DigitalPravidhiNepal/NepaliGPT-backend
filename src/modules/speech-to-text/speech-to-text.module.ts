@@ -6,9 +6,10 @@ import { ConvertAudio } from 'src/helper/utils/conversion';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { sttEntity } from 'src/model/stt.entity';
 import { UploadSoundService } from 'src/helper/utils/uploadSound';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([sttEntity])],
+  imports: [TypeOrmModule.forFeature([sttEntity, PricingEntity])],
   controllers: [SpeechToTextController],
   providers: [SpeechToTextService, OpenAI, UploadSoundService, ConvertAudio],
 })

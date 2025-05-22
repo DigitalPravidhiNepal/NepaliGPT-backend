@@ -7,9 +7,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { contentEntity } from 'src/model/content.entity';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { UsertokenService } from '../usertoken/usertoken.service';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity, userTokenEntity])],
+  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity, userTokenEntity, PricingEntity])],
   controllers: [TemplatesController],
   providers: [TemplatesService, OpenAI, UsertokenService],
 })

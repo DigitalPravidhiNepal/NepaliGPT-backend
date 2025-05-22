@@ -12,9 +12,10 @@ import { UtStrategy } from 'src/middlewares/utils_token/ut.strategy';
 import { ConfigService } from '@nestjs/config';
 import { userEntity } from 'src/model/user.entity';
 import { GoogleStrategy } from 'src/middlewares/Google Oauth/google.strategy';
+import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([authEntity, userEntity])],
+  imports: [TypeOrmModule.forFeature([authEntity, userEntity, PricingEntity])],
   controllers: [AuthController],
   providers: [AuthService, Token, hash, AtStrategy, RtStrategy, UtStrategy, JwtService, ConfigService, GoogleStrategy],
 })
