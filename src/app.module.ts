@@ -22,10 +22,11 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { authEntity } from './model/auth.entity';
 import { superAdminEntity } from './model/superAdmin.entity';
 import { SuperAdminSeederService } from './seed/seeder.service';
+import { PricingEntity } from './model/pricing.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([authEntity, superAdminEntity]),
+    TypeOrmModule.forFeature([authEntity, superAdminEntity, PricingEntity]),
     ThrottlerModule.forRoot({
       throttlers: [
         {
