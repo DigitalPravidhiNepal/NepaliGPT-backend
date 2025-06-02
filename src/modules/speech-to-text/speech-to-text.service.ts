@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSpeechToTextDto } from './dto/create-speech-to-text.dto';
 import OpenAI from 'openai';
 import axios from 'axios';
@@ -14,14 +18,17 @@ export class SpeechToTextService {
   constructor(
     private readonly openai: OpenAI,
     @InjectRepository(sttEntity)
-    private readonly sttRepository: Repository<sttEntity>
+    private readonly sttRepository: Repository<sttEntity>,
   ) {
     this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    })
+      apiKey: process.env.OPENAI_API_KEY,
+    });
   }
 
-  async transcribeAudio(id: string, createSpeechToTextDto: CreateSpeechToTextDto) {
+  async transcribeAudio(
+    id: string,
+    createSpeechToTextDto: CreateSpeechToTextDto,
+  ) {
     try {
       const { title, audio, description } = createSpeechToTextDto;
 
@@ -35,7 +42,7 @@ export class SpeechToTextService {
       const formData = new FormData();
 
       // Append the file stream to form data with proper handling
-      formData.append('file', fileStream, path.basename(filePath));  // Filename should be the actual file name
+      formData.append('file', fileStream, path.basename(filePath)); // Filename should be the actual file name
 
       // Append other required fields
       formData.append('model', 'whisper-1');
@@ -51,7 +58,7 @@ export class SpeechToTextService {
             Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
             ...formData.getHeaders(), // Automatically sets the correct content-type
           },
-        }
+        },
       );
 
       const transcription = response.data.text;
@@ -76,7 +83,10 @@ export class SpeechToTextService {
       };
     } catch (error) {
       // Log the full error response for debugging
-      console.error('Full error response:', error.response ? error.response.data : error.message);
+      console.error(
+        'Full error response:',
+        error.response ? error.response.data : error.message,
+      );
       throw new Error(`Speech-to-text failed: ${error.message}`);
     }
   }
@@ -100,11 +110,11 @@ export class SpeechToTextService {
     try {
       const stt = await this.sttRepository.findOne({ where: { id } });
       if (!stt) {
-        throw new NotFoundException("Transcription not found");
+        throw new NotFoundException('Transcription not found');
       }
 
       if (stt.status === true) {
-        throw new BadRequestException("Transcription has already been saved.");
+        throw new BadRequestException('Transcription has already been saved.');
       }
 
       stt.status = true;
@@ -121,11 +131,13 @@ export class SpeechToTextService {
     try {
       const stt = await this.sttRepository.findOne({ where: { id } });
       if (!stt) {
-        throw new NotFoundException("Transcription not found");
+        throw new NotFoundException('Transcription not found');
       }
 
       if (stt.status === false) {
-        throw new BadRequestException("Transcription has already been removed.");
+        throw new BadRequestException(
+          'Transcription has already been removed.',
+        );
       }
 
       stt.status = false;
@@ -137,9 +149,6 @@ export class SpeechToTextService {
         : new BadRequestException(e.message);
     }
   }
-
-
-
 }
 
 // Function to download the audio file from Cloudinary
@@ -157,10 +166,6 @@ async function downloadAudioFromCloudinary(url: string): Promise<string> {
     writer.on('error', (error) => reject(error));
   });
 }
-
-
-
-
 
 //   update(id: number, updateSpeechToTextDto: UpdateSpeechToTextDto) {
 //     return `This action updates a #${id} speechToText`;

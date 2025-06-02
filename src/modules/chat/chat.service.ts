@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateChatDto, searchChat, SessionId } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateChatDto, SessionId } from './dto/create-chat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import OpenAI from "openai"
+import OpenAI from 'openai';
 import { chatEntity } from 'src/model/chat.entity';
 import { userEntity } from 'src/model/user.entity';
 import { sessionEntity } from 'src/model/session.entity';
+import { Response } from 'express';
+
 @Injectable()
 export class ChatService {
   constructor(
@@ -22,6 +27,61 @@ export class ChatService {
     });
   }
 
+  async streamChat(
+    createChatDto: CreateChatDto,
+    userId: string,
+    sessionDto: SessionId,
+    res: Response,
+  ) {
+    try {
+      const { prompt } = createChatDto;
+      const { sessionId } = sessionDto;
+      let session: sessionEntity;
+
+      if (!sessionId) {
+        session = new sessionEntity();
+        session.user = { id: userId } as userEntity;
+        session.title = prompt.substring(0, 30);
+        session = await this.sessionRepository.save(session);
+      } else {
+        session = await this.sessionRepository.findOne({
+          where: { id: sessionId },
+        });
+        if (!session) throw new Error('Session not found');
+      }
+
+      const stream = await this.openai.chat.completions.create({
+        model: 'gpt-4-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        stream: true,
+      });
+
+      let fullResponse = '';
+
+      for await (const chunk of stream) {
+        const content = chunk.choices?.[0]?.delta?.content;
+        if (content) {
+          fullResponse += content;
+          res.write(`data: ${content}\n\n`);
+        }
+      }
+
+      res.write(`\ndata: [DONE]\n\n`);
+      res.end();
+
+      const chat = new chatEntity();
+      chat.prompt = prompt;
+      chat.response = fullResponse;
+      chat.session = session;
+      chat.user = { id: userId } as userEntity;
+      await this.chatRepository.save(chat);
+    } catch (err) {
+      res.write(`event: error\ndata: ${JSON.stringify(err.message)}\n\n`);
+      res.end();
+    }
+  }
+
   async chat(createChatDto: CreateChatDto, id: string, sessionDto?: SessionId) {
     try {
       const { prompt } = createChatDto;
@@ -35,15 +95,18 @@ export class ChatService {
         session.title = prompt.substring(0, 30); // Set default title as first 30 chars of the first message
         session = await this.sessionRepository.save(session);
       } else {
-        session = await this.sessionRepository.findOne({ where: { id: sessionId } });
+        session = await this.sessionRepository.findOne({
+          where: { id: sessionId },
+        });
         if (!session) throw new Error('Session not found');
       }
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4-turbo",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
+        model: 'gpt-4-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
       });
-      const answer = response.choices[0]?.message?.content || "No response from AI.";
+      const answer =
+        response.choices[0]?.message?.content || 'No response from AI.';
       if (answer) {
         const chat = new chatEntity();
         chat.prompt = prompt;
@@ -54,8 +117,8 @@ export class ChatService {
       }
       return {
         response: answer,
-        sessionId: session.id
-      }
+        sessionId: session.id,
+      };
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -72,7 +135,7 @@ export class ChatService {
     return await this.chatRepository.find({
       where: { session: { id: sessionId }, user: { id: userId } },
       order: { createdAt: 'ASC' }, // Oldest messages first
-      select: { id: true, prompt: true, response: true, session: { id: true } }
+      select: { id: true, prompt: true, response: true, session: { id: true } },
     });
   }
 
@@ -80,21 +143,32 @@ export class ChatService {
     return await this.chatRepository.find({
       where: [
         {
-          user: { id }, prompt: ILike(`%${query}%`)
+          user: { id },
+          prompt: ILike(`%${query}%`),
         },
         {
-          user: { id }, response: ILike(`%${query}%`)
-        }
-      ], relations: ['session'],
-      select: { id: true, prompt: true, response: true, session: { id: true, title: true } },
-      order: { createdAt: 'DESC' }
-    })
-
+          user: { id },
+          response: ILike(`%${query}%`),
+        },
+      ],
+      relations: ['session'],
+      select: {
+        id: true,
+        prompt: true,
+        response: true,
+        session: { id: true, title: true },
+      },
+      order: { createdAt: 'DESC' },
+    });
   }
 
-
-  async renameSessionTitle(sessionId: string, newTitle: string): Promise<sessionEntity> {
-    const session = await this.sessionRepository.findOne({ where: { id: sessionId } });
+  async renameSessionTitle(
+    sessionId: string,
+    newTitle: string,
+  ): Promise<sessionEntity> {
+    const session = await this.sessionRepository.findOne({
+      where: { id: sessionId },
+    });
     if (!session) throw new NotFoundException('Session not found');
 
     session.title = newTitle;
@@ -102,19 +176,17 @@ export class ChatService {
   }
 
   async deleteChat(id: string, sessionId: string) {
-    const session = await this.sessionRepository.findOne({ where: { id: sessionId, user: { id } } });
+    const session = await this.sessionRepository.findOne({
+      where: { id: sessionId, user: { id } },
+    });
     if (!session) throw new NotFoundException('Session not found');
     const remove = await this.sessionRepository.remove(session);
     if (remove) {
       return {
-        status: true
-      }
+        status: true,
+      };
     } else {
-      throw new BadRequestException("Chat couldnot be deleted")
+      throw new BadRequestException('Chat couldnot be deleted');
     }
   }
-
-
-
-
 }
