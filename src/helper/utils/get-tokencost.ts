@@ -19,12 +19,15 @@ export class CalculateUsedToken {
         const baseCost = baseCostMap[imageSize];
         if (!baseCost) return 0;
 
-        const profitMargin = 0.20;
+        const profitMargin = 0.20; // 20% profit
         // const costPerMillionTokens = Number(process.env.TOTALTOKENCOST);
         const pricing = await this.pricingRepository.find()
         const costPerMillionTokens = +pricing[0].totalTokenCost;
+        // console.log("pricing", pricing)
+        // console.log("costPerMillionTokens", costPerMillionTokens)
 
-        const profitAddedCost = baseCost + (baseCost * profitMargin);
+        const profitAddedCost = baseCost + (baseCost * profitMargin); // add 20% profit to the base cost
+        console.log(profitAddedCost)
         const tokenCost = (profitAddedCost / costPerMillionTokens) * 1_000_000;
 
         return Math.floor(tokenCost);

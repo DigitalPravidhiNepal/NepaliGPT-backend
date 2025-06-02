@@ -4,25 +4,18 @@ import {
   Post,
   Body,
   Patch,
-  Param,
-  Delete,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, MailDto, passwordDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Roles } from 'src/middlewares/authorisation/roles.decorator';
-import { roleType } from 'src/helper/types/index.type';
-import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RtGuard } from 'src/middlewares/refresh_token/rt.guard';
-import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
 import { UtGuard } from 'src/middlewares/utils_token/ut.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';

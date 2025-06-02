@@ -10,8 +10,8 @@ import { ApiTags, ApiResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation
 import { PhotoUpdateDto, UpdatePasswordDto } from './dto/update-photo.dto';
 import { UploadService } from 'src/helper/utils/files_upload';
 import { FileInterceptor } from '@nestjs/platform-express'
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
+
 @Controller('user')
 @ApiTags('User')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
@@ -30,7 +30,6 @@ export class UserController {
   }
 
   @Get('all')
-  @UseInterceptors(CacheInterceptor)
   @Roles(roleType.superAdmin)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
@@ -48,7 +47,6 @@ export class UserController {
   }
 
   @Get('get-info')
-  @UseInterceptors(CacheInterceptor)
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
@@ -58,7 +56,6 @@ export class UserController {
   }
 
   @Get('get-info-by-id/:id')
-  @UseInterceptors(CacheInterceptor)
   @Roles(roleType.superAdmin)
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')

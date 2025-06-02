@@ -7,11 +7,9 @@ import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 
 @Controller('image')
-@UseInterceptors(CacheInterceptor)
 @ApiTags('Image')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })

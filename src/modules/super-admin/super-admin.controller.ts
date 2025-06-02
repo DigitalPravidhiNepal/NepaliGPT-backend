@@ -12,7 +12,6 @@ import { CreatePackageDto, UpdatePackageDto } from './dto/package.dto';
 import { PaginationDto } from 'src/helper/utils/pagination.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/helper/utils/files_upload';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdatePriceDto } from '../usertoken/dto/create-token.entity';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
@@ -20,7 +19,6 @@ import { PricingEntity } from 'src/model/pricing.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('super-admin')
-@UseInterceptors(CacheInterceptor)
 @ApiTags('Super Admin')
 @ApiResponse({ status: 201, description: 'Created Successfully' })
 @ApiResponse({ status: 401, description: 'Unathorised request' })
@@ -42,9 +40,6 @@ export class SuperAdminController {
   createSuperAdmin(@Body() createAuthDto: CreateSuperAdminDto) {
     return this.superAdminService.createSuperAdmin(createAuthDto);
   }
-
-
-
 
   // // Delete Super Admin
   // @Delete('delete-super-admin/:id')

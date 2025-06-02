@@ -13,6 +13,7 @@ import { createTokenDto } from './dto/create-token.entity';
 export class UsertokenController {
   constructor(private readonly usertokenService: UsertokenService,
   ) { }
+
   @Post('addToken')
   @Roles(roleType.customer)
   @UseGuards(AtGuard, RolesGuard)
@@ -32,5 +33,11 @@ export class UsertokenController {
     return this.usertokenService.getUserTokens(id);
   }
 
-
+  @Get('per-token-price-nrs')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  getPricePerToken() {
+    return this.usertokenService.getPricePerToken();
+  }
 }

@@ -113,8 +113,4 @@ export class ChatService {
       throw new BadRequestException("Chat couldnot be deleted")
     }
   }
-
-
-
-
 }

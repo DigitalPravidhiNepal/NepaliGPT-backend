@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
-import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
+import { CreateSavedTemplateContentDto, CreateTemplateCategoryDto, CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import OpenAI from 'openai';
@@ -8,7 +8,7 @@ import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
 import { AtGuard } from 'src/middlewares/access_token/at.guard';
 import { RolesGuard } from 'src/middlewares/authorisation/roles.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+// import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('templates')
 @ApiTags('Templates')
@@ -23,6 +23,21 @@ export class TemplatesController {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
     })
+  }
+
+  @Post('create-template-category')
+  @Roles(roleType.superAdmin)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ description: 'create template category by superadmin' })
+  createTemplateCategory(@Body() createTemplateCategoryDto: CreateTemplateCategoryDto) {
+    return this.templatesService.createTemplateCategory(createTemplateCategoryDto);
+  }
+
+  @Get('template-category')
+  @ApiOperation({ summary: "get all template category" })
+  findAllTemplateCategory() {
+    return this.templatesService.findAllTemplateCategory();
   }
 
   @Post()
@@ -56,6 +71,18 @@ export class TemplatesController {
     return this.templatesService.findAll();
   }
 
+  @Get('my-saved-templates-content')
+  @ApiOperation({ summary: "get all saved templates content" })
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @Roles(roleType.customer)
+  findAllSavedContent(
+    @Req() req: any,
+  ) {
+    const userId = req.user.sub;
+    return this.templatesService.findAllSavedContent(userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: "get a template" })
   findOne(@Param('id') id: string) {
@@ -76,9 +103,9 @@ export class TemplatesController {
   @UseGuards(AtGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: "save template content" })
-  update(@Req() req: any, @Param('id') id: string) {
+  update(@Body() Body: CreateSavedTemplateContentDto, @Req() req: any, @Param('id') id: string) {
     const userId = req.user.sub;
-    return this.templatesService.updateStatus(id, userId);
+    return this.templatesService.updateStatus(id, userId, Body);
   }
 
   @Patch('unsave/:id')
@@ -89,6 +116,7 @@ export class TemplatesController {
   unsave(@Param('id') id: string) {
     return this.templatesService.unsave(id);
   }
+
 
   @Delete(':id')
   @Roles(roleType.superAdmin)

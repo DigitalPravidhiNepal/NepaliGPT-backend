@@ -10,6 +10,7 @@ import { contentEntity } from "./content.entity";
 import { userTokenEntity } from "./userToken.entity";
 import { paymentEntity } from "./payment.entity";
 import { sessionEntity } from "./session.entity";
+import { savedTempleteContentEntity } from "./savedTempleteContent.entity";
 
 @Entity('user')
 export class userEntity extends parentEntity {
@@ -70,6 +71,12 @@ export class userEntity extends parentEntity {
         onDelete: 'CASCADE',
     })
     contents: contentEntity[];
+
+    @OneToMany(() => savedTempleteContentEntity, (content) => content.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
+    savedTemplateContents: savedTempleteContentEntity[];
 
     @OneToMany(() => paymentEntity, (payment) => payment.user, {
         cascade: true,

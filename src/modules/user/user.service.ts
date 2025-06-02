@@ -13,7 +13,6 @@ import { ttsEntity } from 'src/model/tts.entity';
 import { DocumentName } from 'src/helper/types/index.type';
 import { authEntity } from 'src/model/auth.entity';
 import { contentEntity } from 'src/model/content.entity';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UpdateAuthDto } from '../auth/dto/update-auth.dto';
 import { UpdatePasswordDto } from './dto/update-photo.dto';
 import { hash } from 'src/helper/utils/hash';
