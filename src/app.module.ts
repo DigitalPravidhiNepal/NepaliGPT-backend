@@ -13,36 +13,33 @@ import { CodeModule } from './modules/code/code.module';
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { TextToSpeechModule } from './modules/text-to-speech/text-to-speech.module';
 import { TemplatesModule } from './modules/templates/templates.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
 import { UsertokenModule } from './modules/usertoken/usertoken.module';
 import { PaymentModule } from './modules/payment/payment.module';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { authEntity } from './model/auth.entity';
 import { superAdminEntity } from './model/superAdmin.entity';
 import { SuperAdminSeederService } from './seed/seeder.service';
 import { PricingEntity } from './model/pricing.entity';
+import { templateCategoryEntity } from './model/templateCategory.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([authEntity, superAdminEntity, PricingEntity]),
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60000,
-          limit: 10,
-        },
-      ],
-    }),
+    TypeOrmModule.forFeature([authEntity, superAdminEntity, PricingEntity, templateCategoryEntity]),
+    // ThrottlerModule.forRoot({
+    //   throttlers: [
+    //     {
+    //       ttl: 60000,
+    //       limit: 10,
+    //     },
+    //   ],
+    // }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    CacheModule.register({
-      isGlobal: true,
-      store: redisStore,
-      ttl: 50 * 1000, // Cache expiration time
-    }),
+    // CacheModule.register({
+    //   isGlobal: true,
+    //   store: redisStore,
+    //   ttl: 50 * 1000, // Cache expiration time
+    // }),
     TypeOrmModule.forRoot(databaseConfig),
     AuthModule,
     UserModule,
@@ -60,10 +57,10 @@ import { PricingEntity } from './model/pricing.entity';
   providers: [
     SuperAdminSeederService,
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class AppModule {}

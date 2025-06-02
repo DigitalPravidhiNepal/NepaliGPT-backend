@@ -4,6 +4,7 @@ import { roleType } from 'src/helper/types/index.type';
 import { authEntity } from 'src/model/auth.entity';
 import { PricingEntity } from 'src/model/pricing.entity';
 import { superAdminEntity } from 'src/model/superAdmin.entity';
+import { templateCategoryEntity } from 'src/model/templateCategory.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -17,7 +18,10 @@ export class SuperAdminSeederService implements OnApplicationBootstrap {
 
     @InjectRepository(PricingEntity)
     private readonly pricingRepository: Repository<PricingEntity>,
-  ) {}
+
+    @InjectRepository(templateCategoryEntity)
+    private readonly templateCategoryRepository: Repository<templateCategoryEntity>,
+  ) { }
 
   async onApplicationBootstrap() {
     // ✅ Seed Super Admin
@@ -54,6 +58,13 @@ export class SuperAdminSeederService implements OnApplicationBootstrap {
       await this.pricingRepository.save(pricing);
 
       console.log('✅ Seeded pricing schema');
+    }
+
+    const existingCategoryName = await this.templateCategoryRepository.findOne({ where: { name: 'UNCATEGORIZED' } });
+    if (!existingCategoryName) {
+      const category = new templateCategoryEntity();
+      category.name = 'UNCATEGORIZED';
+      await this.templateCategoryRepository.save(category);
     }
   }
 }

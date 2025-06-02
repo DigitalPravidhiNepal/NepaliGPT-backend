@@ -66,6 +66,11 @@ export class ImageService {
     if (token.remainingTokens === 0) {
       throw new BadRequestException('Your token balance is 0. Please recharge.');
     }
+    const usedToken = await this.calculateUsedToken.getTokenCost(imageSize);
+    // console.log("*****************")
+    // console.log(usedToken);
+
+    const remainingToken = await this.usertokenService.deductTokens(id, usedToken);
 
     try {
       const response = await this.openai.images.generate({
@@ -79,10 +84,6 @@ export class ImageService {
       const savedImage = await this.uploadService.upload(imageUrl);
 
       if (savedImage && id) {
-        const usedToken = await this.calculateUsedToken.getTokenCost(imageSize);
-        console.log(usedToken);
-
-        const remainingToken = await this.usertokenService.deductTokens(id, usedToken);
 
         const newImage = this.imageRepository.create({
           image: savedImage,
@@ -102,7 +103,7 @@ export class ImageService {
 
       throw new BadRequestException('Image could not be saved.');
     } catch (error) {
-      console.error('Image generation error:', error); // Log for internal debugging
+      console.error('Image generation error:', error);
       if (error?.response?.status === 400) {
         throw new BadRequestException('Your request was blocked by the safety system. Please revise your prompt.');
       }
@@ -131,10 +132,11 @@ export class ImageService {
   //update status as true for saving
   async updateStatus(id: string, userId: string) {
     try {
-      const image = await this.imageRepository.findOne({ where: { id, user: { id } } });
+      const image = await this.imageRepository.findOne({ where: { id, user: { id: userId } } });
       if (!image) {
         throw new NotFoundException("Image not found");
       }
+
       const currentStatus = image.status;
       image.status = !currentStatus;
       return await this.imageRepository.save(image);

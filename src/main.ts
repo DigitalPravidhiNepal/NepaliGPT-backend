@@ -33,7 +33,17 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    customCss: `
+      .swagger-ui { background-color: #1f1f1f; }
+      .swagger-ui .scheme-container { background-color: #1f1f1f; }
+      .title { color: white !important; }
+      .nostyle { color: white !important; }
+      .opblock-body { background-color: #CCCCCC !important; }
+      .swagger-ui .info { color: white; }
+      .model-box { background-color: #cccccc !important; }
+    `,
+  });
 
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalFilters(new GlobalExceptionFilter(httpAdapterHost));

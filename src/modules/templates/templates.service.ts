@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTemplateDto, generateDto } from './dto/create-template.dto';
+import { CreateSavedTemplateContentDto, CreateTemplateCategoryDto, CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { templateEntity } from 'src/model/templates.entity';
@@ -11,6 +11,8 @@ import { TransformationType } from 'class-transformer';
 import { contentEntity } from 'src/model/content.entity';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { UsertokenService } from '../usertoken/usertoken.service';
+import { savedTempleteContentEntity } from 'src/model/savedTempleteContent.entity';
+import { templateCategoryEntity } from 'src/model/templateCategory.entity';
 
 @Injectable()
 export class TemplatesService {
@@ -22,6 +24,10 @@ export class TemplatesService {
     private readonly contentRepo: Repository<contentEntity>,
     @InjectRepository(userTokenEntity)
     private readonly userTokenRepository: Repository<userTokenEntity>,
+    @InjectRepository(savedTempleteContentEntity)
+    private readonly savedTempleteContentRepository: Repository<savedTempleteContentEntity>,
+    @InjectRepository(templateCategoryEntity)
+    private readonly templateCategoryRepo: Repository<templateCategoryEntity>,
     private configService: ConfigService,
     private userTokenService: UsertokenService
 
@@ -47,6 +53,14 @@ export class TemplatesService {
     }
 
   }
+
+  async findAllSavedContent(userId: string) {
+    return this.savedTempleteContentRepository.find({
+      where: { user: { id: userId } },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async generate(id: string, dto: generateDto, userId: string) {
     try {
       const { maxToken, creativity, language, userInputs, tone } = dto;
@@ -56,7 +70,7 @@ export class TemplatesService {
       if (!template) {
         throw new NotFoundException('Template not found');
       }
-      
+
       // Replace placeholders with user-provided values
       let finalPrompt = template.promptTemplate;
       Object.keys(userInputs).forEach((key) => {
@@ -73,7 +87,7 @@ export class TemplatesService {
         Medium: 0.7,
         High: 1.0,
       };
-      const temperature = temperatureMapping[creativity] || 0.7; 
+      const temperature = temperatureMapping[creativity] || 0.7;
       const token = await this.userTokenRepository.findOne({ where: { user: { id: userId } } });
       if (!token) {
         throw new BadRequestException("Please buy token to use the service");
@@ -88,14 +102,14 @@ export class TemplatesService {
         max_tokens: maxToken,
         temperature: temperature,
       });
-      console.log(response)
+      return response
       return
       if (response) {
         // Extract and process generated content
         const generatedContent = response.choices
           .map(choice => choice.message?.content?.trim() ?? '') // Ensure content exists
           .join("\n");
-        // Save generated content
+        // Save generated content 
         const Content = new contentEntity();
         Content.content = generatedContent;
         Content.user = { id: userId } as userEntity;
@@ -145,18 +159,34 @@ export class TemplatesService {
   }
 
   //update status as true for saving
-  async updateStatus(id: string, userId: string) {
+  async updateStatus(id: string, userId: string, body: CreateSavedTemplateContentDto) {
     try {
-      const Content = await this.contentRepo.findOne({ where: { id } });
-      if (!Content) {
-        throw new NotFoundException("Content not found");
+      const template = await this.templateRepo.findOne({ where: { id } });
+      if (!template) {
+        throw new NotFoundException("Template not found");
       }
-      if (Content.status === true) {
-        throw new BadRequestException("Content has already been saved");
+      const inputDataRecord: Record<string, any> = {};
+      if (Array.isArray(body.inputData)) {
+        for (const item of body.inputData) {
+          inputDataRecord[item.key] = item.value;
+        }
       }
-      Content.status = true;
-      Content.user = { id: userId } as userEntity;
-      return await this.templateRepo.save(Content);
+      const savedContent = new savedTempleteContentEntity();
+      savedContent.content = body.content;
+      savedContent.template = { id } as templateEntity;
+      savedContent.inputData = inputDataRecord;
+      savedContent.user = { id: userId } as userEntity;
+      return await this.savedTempleteContentRepository.save(savedContent);
+      // const Content = await this.contentRepo.findOne({ where: { template: { id } } });
+      // if (!Content) {
+      //   throw new NotFoundException("Content not found");
+      // }
+      // if (Content.status === true) {
+      //   throw new BadRequestException("Content has already been saved");
+      // }
+      // Content.status = true;
+      // Content.user = { id: userId } as userEntity;
+      // return await this.templateRepo.save(Content);
     } catch (e) {
       throw e instanceof NotFoundException || e instanceof BadRequestException
         ? e
@@ -166,15 +196,20 @@ export class TemplatesService {
 
   async unsave(id: string) {
     try {
-      const content = await this.contentRepo.findOne({ where: { id } });
-      if (!content) {
-        throw new NotFoundException("Content not found");
+      const savedContent = await this.savedTempleteContentRepository.findOne({ where: { id } });
+      if (!savedContent) {
+        throw new NotFoundException("Saved content not found");
       }
-      if (content.status === false) {
-        throw new BadRequestException("Content has already been removed");
-      }
-      content.status = false;
-      return await this.templateRepo.save(content);
+      return await this.savedTempleteContentRepository.remove(savedContent);
+      // const content = await this.contentRepo.findOne({ where: { id } });
+      // if (!content) {
+      //   throw new NotFoundException("Content not found");
+      // }
+      // if (content.status === false) {
+      //   throw new BadRequestException("Content has already been removed");
+      // }
+      // content.status = false;
+      // return await this.templateRepo.save(content);
     } catch (e) {
       throw e instanceof NotFoundException || e instanceof BadRequestException
         ? e
@@ -232,6 +267,26 @@ export class TemplatesService {
         throw new NotFoundException("template not found");
       }
       return await this.templateRepo.remove(template);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  async createTemplateCategory(templateCategoryDto: CreateTemplateCategoryDto) {
+    try {
+      const templateCategory = await this.templateCategoryRepo.findOne({ where: { name: templateCategoryDto.name } });
+      if (templateCategory) {
+        throw new BadRequestException("template category already exists");
+      }
+      return await this.templateCategoryRepo.save(templateCategoryDto);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  async findAllTemplateCategory() {
+    try {
+      return await this.templateCategoryRepo.find();
     } catch (e) {
       throw new BadRequestException(e.message);
     }

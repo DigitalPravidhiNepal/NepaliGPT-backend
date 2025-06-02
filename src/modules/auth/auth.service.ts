@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -20,7 +19,6 @@ import {
 import { sendMail } from 'src/config/mail.config';
 import { userEntity } from 'src/model/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {

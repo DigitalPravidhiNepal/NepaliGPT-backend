@@ -15,7 +15,9 @@ import { GoogleStrategy } from 'src/middlewares/Google Oauth/google.strategy';
 import { PricingEntity } from 'src/model/pricing.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([authEntity, userEntity, PricingEntity])],
+  imports: [
+    TypeOrmModule.forFeature([authEntity, userEntity, PricingEntity]),
+  ],
   controllers: [AuthController],
   providers: [AuthService, Token, hash, AtStrategy, RtStrategy, UtStrategy, JwtService, ConfigService, GoogleStrategy],
 })

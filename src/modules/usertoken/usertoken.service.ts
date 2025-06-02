@@ -48,6 +48,7 @@ export class UsertokenService {
     // Deduct tokens when the user uses a service
     async deductTokens(userId: string, usedToken: number) {
         const userTokens = await this.userTokensRepo.findOne({ where: { user: { id: userId } } });
+        console.log(userTokens)
 
         // Check if userTokens exists and has enough remaining tokens
         if (!userTokens) {
@@ -58,7 +59,7 @@ export class UsertokenService {
             throw new BadRequestException("Insufficient tokens. Please recharge.");
         }
 
-        // Update user's token usage
+        // Update user's token usage 
         userTokens.usedTokens += usedToken;
         userTokens.remainingTokens -= usedToken;
 
@@ -81,4 +82,21 @@ export class UsertokenService {
     async getUserTokens(userId: string) {
         return await this.userTokensRepo.findOne({ where: { user: { id: userId } } });
     }
+
+    async getPricePerToken() {
+        const pricing = await this.pricingRepository.find();
+
+        if (!pricing || pricing.length === 0) {
+            throw new Error("No pricing data found.");
+        }
+
+        const exchangeRate = +pricing[0].exchangeRate; // e.g., USD to local currency
+        const totalCostPerMillionTokens = +pricing[0].totalTokenCost; // Cost in USD for 1M tokens
+
+        // Convert total cost to local currency and then find per-token cost
+        const oneTokenCost = (exchangeRate * totalCostPerMillionTokens) / 1_000_000;
+
+        return oneTokenCost;
+    }
+
 }

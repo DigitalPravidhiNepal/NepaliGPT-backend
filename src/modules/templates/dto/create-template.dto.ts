@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
+  IsNotEmpty,
   IsNumber,
   IsObject,
   IsString,
@@ -82,4 +83,47 @@ export class generateDto {
   @IsEnum(ContentTone)
   @ApiProperty({ enum: ContentTone })
   tone: ContentTone;
+}
+
+class InputDataItem {
+  @ApiProperty({ example: 'title' })
+  @IsString()
+  key: string;
+
+  @ApiProperty({ example: 'How AI is Changing the World' })
+  @IsNotEmpty()
+  value: any; // Can be string, number, etc.
+}
+
+export class CreateSavedTemplateContentDto {
+  @ApiProperty({
+    example: 'This is the final AI-generated content based on the user inputs.',
+    description: 'The generated output content.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  content: string;
+
+  @ApiProperty({
+    description: 'Dynamic user inputs as key-value pairs.',
+    example: [
+      { key: 'title', value: 'How AI is Changing the World' },
+      {
+        key: 'summary',
+        value:
+          'A deep dive into the impact of artificial intelligence on society.',
+      },
+      { key: 'author', value: 'John Doe' },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => InputDataItem)
+  inputData: InputDataItem[];
+}
+
+export class CreateTemplateCategoryDto {
+  @IsString()
+  @ApiProperty()
+  name: string;
 }
