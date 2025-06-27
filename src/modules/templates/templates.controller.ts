@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, UseInterceptors, Query } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { CreateSavedTemplateContentDto, CreateTemplateCategoryDto, CreateTemplateDto, generateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
-import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import OpenAI from 'openai';
 import { Roles } from 'src/middlewares/authorisation/roles.decorator';
 import { roleType } from 'src/helper/types/index.type';
@@ -59,17 +59,29 @@ export class TemplatesController {
     return this.templatesService.generate(id, dto, userId);
   }
 
+  @Get()
+  @ApiOperation({ summary: "get all templates" })
+  @UseGuards(AtGuard, RolesGuard)
+  findAll(
+    @Query('categoryId') categoryId: string,
+    @Req() req: any
+  ) {
+    const userId = req.user.sub;
+    return this.templatesService.findAll(categoryId, userId);
+  }
+
+  @Get('category')
+  @ApiOperation({ summary: "get all category" })
+  findAllCategory() {
+    return this.templatesService.findAllCategory();
+  }
+
   @Get('popular')
   @ApiOperation({ summary: "get popular templates" })
   findPopular() {
     return this.templatesService.getPopular();
   }
 
-  @Get()
-  @ApiOperation({ summary: "get all templates" })
-  findAll() {
-    return this.templatesService.findAll();
-  }
 
   @Get('my-saved-templates-content')
   @ApiOperation({ summary: "get all saved templates content" })
@@ -83,10 +95,30 @@ export class TemplatesController {
     return this.templatesService.findAllSavedContent(userId);
   }
 
+  @Get('is-my-favorite/:id')
+  @ApiOperation({ summary: "check if template is favorite" })
+  isFavorite(
+    @Req() req: any,
+    @Param('id') templateId: string
+  ) {
+    const userId = req.user.sub;
+    return this.templatesService.isMyFavorite(templateId, userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: "get a template" })
   findOne(@Param('id') id: string) {
     return this.templatesService.findOne(id);
+  }
+
+  @Post('toggle-favorite/:id')
+  @Roles(roleType.customer)
+  @UseGuards(AtGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "mark template as favorite" })
+  markAsFavorite(@Req() req: any, @Param('id') templateId: string,) {
+    const userId = req.user.sub;
+    return this.templatesService.toggleFavorite(templateId, userId);
   }
 
   @Patch(':id')
@@ -116,7 +148,6 @@ export class TemplatesController {
   unsave(@Param('id') id: string) {
     return this.templatesService.unsave(id);
   }
-
 
   @Delete(':id')
   @Roles(roleType.superAdmin)

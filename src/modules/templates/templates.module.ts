@@ -10,9 +10,10 @@ import { UsertokenService } from '../usertoken/usertoken.service';
 import { PricingEntity } from 'src/model/pricing.entity';
 import { savedTempleteContentEntity } from 'src/model/savedTempleteContent.entity';
 import { templateCategoryEntity } from 'src/model/templateCategory.entity';
+import { userEntity } from 'src/model/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity, userTokenEntity, PricingEntity, savedTempleteContentEntity, templateCategoryEntity])],
+  imports: [TypeOrmModule.forFeature([templateEntity, contentEntity, userTokenEntity, PricingEntity, savedTempleteContentEntity, templateCategoryEntity, userEntity])],
   controllers: [TemplatesController],
   providers: [TemplatesService, OpenAI, UsertokenService],
 })

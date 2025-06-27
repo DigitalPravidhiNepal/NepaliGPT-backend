@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateChatDto, SessionId } from './dto/create-chat.dto';
@@ -47,7 +48,7 @@ export class ChatService {
         session = await this.sessionRepository.findOne({
           where: { id: sessionId },
         });
-        if (!session) throw new Error('Session not found');
+        if (!session) throw new NotAcceptableException('Session not found');
       }
 
       const stream = await this.openai.chat.completions.create({
@@ -63,7 +64,8 @@ export class ChatService {
         const content = chunk.choices?.[0]?.delta?.content;
         if (content) {
           fullResponse += content;
-          res.write(`data: ${content}\n\n`);
+          // res.write(`data: ${content}\n\n`);
+          res.write(`data: ${JSON.stringify({ response: content, sessionId: session.id })}\n\n`);
         }
       }
 

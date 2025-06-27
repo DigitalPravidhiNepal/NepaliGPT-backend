@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString, IsEnum, IsArray, ValidateNested, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsArray, ValidateNested, IsOptional, IsBoolean } from 'class-validator';
 import { AccessType, category, inputType } from 'src/helper/types/index.type';
 
 export class UpdateFieldDto {
@@ -43,10 +43,10 @@ export class UpdateTemplateDto {
     @ApiPropertyOptional({ enum: AccessType, enumName: 'AccessType', description: 'Access level for the template' })
     pricing: AccessType;
 
-    @IsEnum(category)
     @IsOptional()
     @ApiPropertyOptional({ enum: category, enumName: 'Category', description: 'Category of the template' })
-    category: category;
+    @IsArray()
+    categoryIds: category;
 
     @IsOptional()
     @IsArray()
@@ -59,4 +59,9 @@ export class UpdateTemplateDto {
     @IsOptional()
     @ApiPropertyOptional({ description: 'Prompt template for generating the template content' })
     promptTemplate: string;
+
+    @IsBoolean()
+    @IsOptional()
+    @ApiPropertyOptional({ description: 'Whether the template is active or not' })
+    isFeatured: boolean;
 }

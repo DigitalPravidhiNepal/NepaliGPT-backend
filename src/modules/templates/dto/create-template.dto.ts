@@ -49,9 +49,10 @@ export class CreateTemplateDto {
   @ApiProperty()
   pricing: AccessType;
 
-  @IsEnum(category)
-  @ApiProperty({ enum: category })
-  category: category;
+  @ApiProperty({ example: ['test'] })
+  @IsArray()
+  // @ValidateNested({ each: true })
+  categoryIds: string[];
 
   @IsArray()
   @ValidateNested({ each: true })

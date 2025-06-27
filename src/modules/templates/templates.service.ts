@@ -3,11 +3,10 @@ import { CreateSavedTemplateContentDto, CreateTemplateCategoryDto, CreateTemplat
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { templateEntity } from 'src/model/templates.entity';
-import { ILike, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import OpenAI from 'openai';
 import { ConfigService } from '@nestjs/config';
 import { userEntity } from 'src/model/user.entity';
-import { TransformationType } from 'class-transformer';
 import { contentEntity } from 'src/model/content.entity';
 import { userTokenEntity } from 'src/model/userToken.entity';
 import { UsertokenService } from '../usertoken/usertoken.service';
@@ -23,11 +22,15 @@ export class TemplatesService {
     @InjectRepository(contentEntity)
     private readonly contentRepo: Repository<contentEntity>,
     @InjectRepository(userTokenEntity)
+    // private readonly categoryRepo: Repository<templateCategoryEntity>,
+    // @InjectRepository(templateCategoryEntity)
     private readonly userTokenRepository: Repository<userTokenEntity>,
     @InjectRepository(savedTempleteContentEntity)
     private readonly savedTempleteContentRepository: Repository<savedTempleteContentEntity>,
     @InjectRepository(templateCategoryEntity)
     private readonly templateCategoryRepo: Repository<templateCategoryEntity>,
+    @InjectRepository(userEntity)
+    private readonly userRepo: Repository<userEntity>,
     private configService: ConfigService,
     private userTokenService: UsertokenService
 
@@ -39,19 +42,49 @@ export class TemplatesService {
   //create template
   async create(createTemplateDto: CreateTemplateDto) {
     try {
-      const { title, description, pricing, category, promptTemplate, fields } = createTemplateDto;
-      const template = new templateEntity()
+      const { title, description, pricing, categoryIds, promptTemplate, fields } = createTemplateDto;
+
+      const categories = await this.templateCategoryRepo.find({
+        where: { id: In(categoryIds) },
+      });
+
+      const template = new templateEntity();
       template.title = title;
       template.description = description;
       template.pricing = pricing;
-      template.category = category;
+      template.categories = categories;
       template.promptTemplate = promptTemplate;
       template.fields = fields;
-      return await this.templateRepo.save(template)
+
+      return await this.templateRepo.save(template);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
+  }
 
+
+  async isMyFavorite(templateId: string, userId: string) {
+    try {
+      const user = await this.userRepo.findOne({
+        where: { id: userId },
+        relations: ['favorites'],
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const template = await this.templateRepo.findOne({ where: { id: templateId } });
+      if (!template) {
+        throw new NotFoundException('Template not found');
+      }
+
+      const isFavorite = user.favorites.some((fav) => fav.id === templateId);
+
+      return isFavorite;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   async findAllSavedContent(userId: string) {
@@ -131,9 +164,9 @@ export class TemplatesService {
 
 
   //filter templates by category
-  async filterByCategory(categoryName) {
+  async filterByCategory(categoryId) {
     try {
-      const templates = await this.templateRepo.find({ where: { category: ILike(categoryName) } });
+      const templates = await this.templateRepo.find({ where: { categories: { id: categoryId } } });
       return templates;
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -143,20 +176,38 @@ export class TemplatesService {
   //create template
   async update(id: string, updateTemplateDto: UpdateTemplateDto) {
     try {
-      const template = await this.templateRepo.findOne({ where: { id } });
+      const template = await this.templateRepo.findOne({
+        where: { id },
+        relations: ['categories'],
+      });
+
       if (!template) {
         throw new NotFoundException("Template not found");
       }
-      Object.assign(template, updateTemplateDto)
-      return {
-        message: "updated successfully",
-        template: await this.templateRepo.save(template)
+
+      const { categoryIds, ...otherUpdates } = updateTemplateDto;
+
+      // Update categories if provided
+      if (categoryIds && Array.isArray(categoryIds)) {
+        const categories = await this.templateCategoryRepo.find({
+          where: { id: In(categoryIds) },
+        });
+        template.categories = categories;
       }
+
+      // Apply other fields
+      Object.assign(template, otherUpdates);
+
+      const saved = await this.templateRepo.save(template);
+      return {
+        message: "Updated successfully",
+        template: saved,
+      };
     } catch (e) {
       throw new BadRequestException(e.message);
     }
-
   }
+
 
   //update status as true for saving
   async updateStatus(id: string, userId: string, body: CreateSavedTemplateContentDto) {
@@ -218,36 +269,56 @@ export class TemplatesService {
   }
 
   //get all templates
-  async findAll() {
+  async findAll(categoryId: string, userId: string) {
     try {
-      return await this.templateRepo.find({
+      if (categoryId) {
+        const category = await this.templateCategoryRepo.findOne({ where: { id: categoryId } });
+        const resp = await this.templateRepo.find({
+          where: { categories: { id: categoryId } },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            pricing: true,
+            categories: true,
+            isFeatured: true
+          },
+        })
+        return resp
+      }
+
+      const resp = await this.templateRepo.find({
         select: {
           id: true,
           title: true,
           description: true,
-          category: true,
           pricing: true,
-        }
+          categories: true,
+          isFeatured: true
+        },
+        relations: ['categories']
       })
+      return resp
+      return resp.map(template => ({
+        ...template,
+        isMyFavorite: template.favoritedBy.some(user => user.id === userId)
+      }))
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
+  async findAllCategory() {
+    return await this.templateCategoryRepo.find();
+  }
+
   async getPopular() {
-    return await this.templateRepo
-      .createQueryBuilder('t') // Alias "t" for Template table
-      .leftJoin('content', 'c', 't.id = c.templateId') // Join Content table where templateId matches
-      .select(['t.id AS id', 't.title AS title', 't.description AS description', 'COUNT(c.id) AS usage_count']) // Select template ID, name, and count of usage
-      .groupBy('t.id') // Group results by template ID
-      .orderBy('usage_count', 'DESC') // Sort by most used templates
-      .limit(6) // Limit to top 5 results
-      .getRawMany(); // Return raw query result
+    return this.templateRepo.find({ where: { isFeatured: true } });
 
   }
   async findOne(id: string) {
     try {
-      const template = await this.templateRepo.findOne({ where: { id } });
+      const template = await this.templateRepo.findOne({ where: { id }, relations: ['categories'] });
       if (!template) {
         throw new NotFoundException("template not found");
       }
@@ -255,6 +326,44 @@ export class TemplatesService {
 
       return template;
 
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  async toggleFavorite(templateId: string, userId: string) {
+    try {
+      const user = await this.userRepo.findOne({
+        where: { id: userId },
+        relations: ['favorites'], // important to load existing favorites
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const template = await this.templateRepo.findOne({ where: { id: templateId } });
+      if (!template) {
+        throw new NotFoundException('Template not found');
+      }
+
+      const alreadyFavorite = user.favorites.some((fav) => fav.id === templateId);
+
+      if (alreadyFavorite) {
+        // Remove from favorites
+        user.favorites = user.favorites.filter((fav) => fav.id !== templateId);
+      } else {
+        // Add to favorites
+        user.favorites.push(template);
+      }
+
+      await this.userRepo.save(user);
+
+      return {
+        message: alreadyFavorite
+          ? 'Template removed from favorites'
+          : 'Template added to favorites',
+      };
     } catch (e) {
       throw new BadRequestException(e.message);
     }

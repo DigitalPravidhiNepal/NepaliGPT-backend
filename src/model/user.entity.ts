@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from "typeorm";
 import { parentEntity } from ".";
 import { authEntity } from "./auth.entity";
 import { imageEntity } from "./image.entity";
@@ -11,6 +11,7 @@ import { userTokenEntity } from "./userToken.entity";
 import { paymentEntity } from "./payment.entity";
 import { sessionEntity } from "./session.entity";
 import { savedTempleteContentEntity } from "./savedTempleteContent.entity";
+import { templateEntity } from "./templates.entity";
 
 @Entity('user')
 export class userEntity extends parentEntity {
@@ -28,6 +29,11 @@ export class userEntity extends parentEntity {
 
     @Column({ default: false })
     isActive: boolean;
+
+    @ManyToMany(() => templateEntity, (template) => template.favoritedBy)
+    @JoinTable()
+    favorites: templateEntity[];
+
 
     @OneToOne(() => authEntity, (auth) => auth.user, {
         cascade: true,

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToMany } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import { parentEntity } from ".";
 import { templateEntity } from "./templates.entity";
 
@@ -7,7 +7,7 @@ export class templateCategoryEntity extends parentEntity {
     @Column()
     name: string;
 
-    @ManyToMany(() => templateEntity, (template) => template.categories)
-    @JoinColumn({ name: 'templateId' })
+    @ManyToMany(() => templateEntity, (template) => template.categories,{ nullable: true })
+    @JoinTable({ name: 'template_category' })
     templates: templateEntity[];
 }

@@ -34,7 +34,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 @ApiResponse({ status: 400, description: 'Bad request' })
 @ApiResponse({ status: 500, description: 'Server Error' })
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService) { }
 
   @Post()
   @Roles(roleType.customer)
